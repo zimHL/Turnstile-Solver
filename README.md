@@ -18,3 +18,6 @@ simple and easy method to solve turnstile. You can use the method used for solvi
    ```
    python main.py
    ```
+
+
+Inspired by [Turnaround](https://github.com/Body-Alhoha/turnaround)
