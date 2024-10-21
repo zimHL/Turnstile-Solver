@@ -1,5 +1,5 @@
 # Turnstile Solver python
-simple and easy method to solve turnstile. You can use the method used for solving turnstile with your code without running another chrome for turnstile.
+A simple and easy method to solve Turnstile. You can use this method to solve Turnstile with your code without running another instance of Chrome.
 
 ## Prerequisites
 
