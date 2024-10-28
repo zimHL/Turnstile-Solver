@@ -21,24 +21,19 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 - Make a python virtual environment: `python3 -m venv venv`
 - Source the environment: `venv\Scripts\activate` (Windows) / `source venv/bin/activate` (macOS, Linux)
 - Install the requirements: `pip install -r requirements.txt`
-- Start: `Remove comments for testing in async and sync python files then run these`
+- Start: `Remove comments for testing in async and sync python files then run those`
 
 ---
 
 ### 🔥 Features
-- Nice Embeds
-- Easy rebrand
-- Creates vouch messages
-- Can dm the user with his product (file/text) or stock (saved under stock/productname.txt)
-- Checks if the user vouched in the rigt format (+rep <@ownerid> quantity product price)
-- Checks if the user made a 5 star website review before opening a ticket
-- Smart Ticket system included (.replace will close the ticket)
-- Auto Scrapes warranty duration from product titles and saves data in product.json (Product id, title and warranty duration)
-- Customizable, if you manually changed a warranty duration in json it will not update it while scrapping
-- Can add excluded product ids for the warranty scrapper in excluded.json
-- Everything in config.json is customizable and changable using the .set command
-- Transcribe the replace ticket!
-- And more!
+- **Debug Logging**: Detailed debug logs track actions and progress, making troubleshooting straightforward.
+- **Automated CAPTCHA Solver**: Uses Playwright to launch a browser, navigate to the target page, and dynamically injects a CAPTCHA solver.
+- **Customizable Browser Context**: Sets browser options like headless mode, sandboxing, and disabling unnecessary features to optimize performance.
+- **Responsive CAPTCHA Interaction**: Adjusts CAPTCHA display, clicks on it, and retrieves the response through repeated attempts if necessary.
+- **Timeout and Retries**: Implements a retry loop with configurable timeouts, ensuring robust attempts to retrieve the CAPTCHA token.
+- **Elapsed Time Tracking**: Logs and returns elapsed time for solving CAPTCHA, providing an efficiency metric.
+- **Error Handling**: Returns detailed status messages on success or failure, allowing for straightforward integration and feedback.
+
 ---
 #### 📹 Preview
 
