@@ -130,5 +130,12 @@ async def get_turnstile_token(headless=False, url=None, sitekey=None):
             log.debug("Browser closed. Returning result.")
         return result
 
+# async def main():
+#     result = await get_turnstile_token(headless=False, url="https://bypass.city/", sitekey="0x4AAAAAAAGzw6rXeQWJ_y2P")
+#     print(result)
+
+# asyncio.run(main())
+
+
 # Credits for the changes: github.com/sexfrance
 # Credit for the original script: https://github.com/Theyka/
