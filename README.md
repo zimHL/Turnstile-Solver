@@ -21,7 +21,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 - Make a python virtual environment: `python3 -m venv venv`
 - Source the environment: `venv\Scripts\activate` (Windows) / `source venv/bin/activate` (macOS, Linux)
 - Install the requirements: `pip install -r requirements.txt`
-- Start: `python3 main.py`
+- Start: `Remove comments for testing in async and sync python files then run these`
 
 ---
 
