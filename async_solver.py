@@ -1,4 +1,4 @@
-# Made the script async, less ressource intensive, solve time ≈ 5 seconds can be faster depending on your internet and if you remove the logging, added page.html directly in the script
+# Made the script async, faster, less ressource intensive, solve time ≈ 5 seconds can be faster depending on your internet and if you remove the logging, added page.html directly in the script
 
 import asyncio
 from undetected_playwright.async_api import async_playwright
