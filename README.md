@@ -54,7 +54,7 @@ v0.0.1 ⋮ 21/10/2024
 ! Initial release
 
 v0.0.2 ⋮ 10/28/2024
-! Modified the script, page.html is now in the scripts, made it faster and less resource intensive, modified the sync logic and made an async version, implemented logmagix logging
+! Modified the script, page.html is now in the scripts, made it faster and less resource intensive, modified the sync logic and made an async version, implemented logmagix logging, added timer...
 ```
 
 ---
