@@ -15,7 +15,8 @@ async def get_turnstile_token(headless=False, url=None, sitekey=None):
     loader.start()
     log = Logger()
     config = load_config()
-    Debug = config["Debug"]
+    # Debug = config["Debug"]
+    Debug = True
     
     async with async_playwright() as playwright:
         args = [
