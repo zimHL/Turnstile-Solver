@@ -138,4 +138,4 @@ async def get_turnstile_token(headless=False, url=None, sitekey=None):
 
 
 # Credits for the changes: github.com/sexfrance
-# Credit for the original script: https://github.com/Theyka/
+# Credit for the original script: github.com/Theyka
