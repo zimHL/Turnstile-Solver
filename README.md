@@ -7,11 +7,11 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
     <br />
     <a href="https://discord.cyberious.xyz">💬 Discord</a>
     ·
-    <a href="https://github.com/sexfrance/sexfrance/Turnstile-Solver">📜 ChangeLog</a>
+    <a href="https://github.com/sexfrance/Turnstile-Solver#-changelog">📜 ChangeLog</a>
     ·
-    <a href="https://github.com/sexfrance/sexfrance/Turnstile-Solver">⚠️ Report Bug</a>
+    <a href="https://github.com/sexfrance/Turnstile-Solver/issues">⚠️ Report Bug</a>
     ·
-    <a href="https://github.com/sexfrance/sexfrance/Turnstile-Solver">💡 Request Feature</a>
+    <a href="https://github.com/sexfrance/Turnstile-Solver/issues">💡 Request Feature</a>
   </p>
 </div>
 
