@@ -1,19 +1,13 @@
 # Made the solving faster, less ressource intensive, solve time ≈ 4 seconds can be faster depending on your internet and if you remove the logging, added page.html directly in the script
 import time
-import json
 from undetected_playwright.sync_api import sync_playwright
 from logmagix import Logger, Loader
-
-def load_config():
-    with open('config.json', 'r') as f:
-        return json.load(f)
 
 def get_turnstile_token(headless=False, url=None, sitekey=None):
     loader = Loader(desc="Solving captcha...", timeout=0.05)
     loader.start()
     log = Logger()
-    config = load_config()
-    Debug = config["Debug"]
+    Debug = True
     
     with sync_playwright() as playwright:
         args = [
@@ -126,9 +120,9 @@ def get_turnstile_token(headless=False, url=None, sitekey=None):
             log.debug("Browser closed. Returning result.")
         return result
     
-
-# result = get_turnstile_token(headless=False, url="https://bypass.city/", sitekey="0x4AAAAAAAGzw6rXeQWJ_y2P")
-# print(result)
+if __name__ == "__main__":
+    result = get_turnstile_token(headless=False, url="https://bypass.city/", sitekey="0x4AAAAAAAGzw6rXeQWJ_y2P")
+    print(result)
 
 # Credits for the changes: github.com/sexfrance
 # Credit for the original script: github.com/Theyka

@@ -4,18 +4,12 @@ import asyncio
 from undetected_playwright.async_api import async_playwright
 from logmagix import Logger, Loader
 import time
-import json
 
-def load_config():
-    with open('config.json', 'r') as f:
-        return json.load(f)
 
 async def get_turnstile_token(headless=False, url=None, sitekey=None):
     loader = Loader(desc="Solving captcha...", timeout=0.05)
     loader.start()
     log = Logger()
-    config = load_config()
-    # Debug = config["Debug"]
     Debug = True
     
     async with async_playwright() as playwright:
@@ -130,11 +124,12 @@ async def get_turnstile_token(headless=False, url=None, sitekey=None):
             log.debug("Browser closed. Returning result.")
         return result
 
-# async def main():
-#     result = await get_turnstile_token(headless=False, url="https://bypass.city/", sitekey="0x4AAAAAAAGzw6rXeQWJ_y2P")
-#     print(result)
+if __name__ == "__main__":
+    async def main():
+        result = await get_turnstile_token(headless=False, url="https://bypass.city/", sitekey="0x4AAAAAAAGzw6rXeQWJ_y2P")
+        print(result)
 
-# asyncio.run(main())
+    asyncio.run(main())
 
 
 # Credits for the changes: github.com/sexfrance
