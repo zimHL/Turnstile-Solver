@@ -26,6 +26,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 ---
 
 ### 🔥 Features
+
 - **Debug Logging**: Detailed debug logs track actions and progress, making troubleshooting straightforward.
 - **Automated CAPTCHA Solver**: Uses Playwright to launch a browser, navigate to the target page, and dynamically injects a CAPTCHA solver.
 - **Customizable Browser Context**: Sets browser options like headless mode, sandboxing, and disabling unnecessary features to optimize performance.
@@ -35,11 +36,13 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 - **Error Handling**: Returns detailed status messages on success or failure, allowing for straightforward integration and feedback.
 
 ---
+
 #### 📹 Preview
 
 ![Preview](https://i.imgur.com/YI6RZ5P.gif)
 
 ---
+
 ### ❗ Disclaimers
 
 - I am not responsible for anything that may happen, such as API Blocking, IP ban, etc.
@@ -54,9 +57,18 @@ v0.0.1 ⋮ 21/10/2024
 ! Initial release
 
 v0.0.2 ⋮ 10/28/2024
-! Modified the script, page.html is now in the scripts, made it faster and less resource intensive, modified the sync logic and made an async version, implemented logmagix logging, added timer...
-```
+! Modified the script, page.html is now in the scripts
+! Made it faster and less resource intensive
+! Modified the sync logic and made an async version
+! Implemented logmagix logging
+! Added timer
 
+v0.0.3 ⋮ 11/7/2024
++ Added API server implementation
++ Added web interface for API documentation
++ Improved error handling and logging
++ Added concurrent processing support
+```
 ---
 
 <p align="center">
@@ -64,6 +76,5 @@ v0.0.2 ⋮ 10/28/2024
   <img src="https://img.shields.io/github/stars/sexfrance/Turnstile-Solver.svg?style=for-the-badge&labelColor=black&color=f429ff&logo=IOTA"/>
   <img src="https://img.shields.io/github/languages/top/sexfrance/Turnstile-Solver.svg?style=for-the-badge&labelColor=black&color=f429ff&logo=python"/>
 </p>
-
 
 Inspired by [Turnaround](https://github.com/Body-Alhoha/turnaround)
