@@ -8,14 +8,26 @@ A simple and easy method to solve Turnstile. You can use this method to solve Tu
 
 ## Installation
 
-1. Download [Python 3](https://www.python.org/), [Patchright Python by Kaliiiiiiiiii-Vinyzu](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-python)
+1. Download [Python 3](https://www.python.org/)
 
-2. Clone the repo
+2. Install requirements
+   ```bash
+   pip install patchright quart
    ```
+
+3. Install Chromium for Patchright
+   ```bash
+   patchright install chromium
+   # if it does not work then try this:
+   python -m patchright install chromium
+   ```
+
+4. Clone the repo
+   ```bash
    git clone https://github.com/Theyka/turnstile-solver.git
    ```
-3. Start python code
-   ```
+5. Start python code
+   ```bash
    python main.py
    ```
 
