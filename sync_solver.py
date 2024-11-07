@@ -1,7 +1,7 @@
 import time
 from typing import Dict, Optional
 from dataclasses import dataclass
-from undetected_playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
+from patchright.sync_api import sync_playwright, Browser, Page, BrowserContext
 from logmagix import Logger, Loader
 
 @dataclass

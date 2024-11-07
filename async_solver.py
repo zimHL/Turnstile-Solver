@@ -2,7 +2,7 @@ import asyncio
 import time
 from typing import Dict, Optional
 from dataclasses import dataclass
-from undetected_playwright.async_api import async_playwright, Browser, Page, BrowserContext
+from patchright.async_api import async_playwright, Browser, Page, BrowserContext
 from logmagix import Logger, Loader
 
 @dataclass

@@ -2,7 +2,7 @@
  
   <h2 align="center">Cloudflare - Turnstile Solver</h2>
   <p align="center">
-A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6 seconds solve time). The script uses undetected Playwright library to interact with web pages and solve the challenges without running additional browser instances.
+A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6 seconds solve time). The script uses patchright library to interact with web pages and solve the challenges without running additional browser instances.
     <br />
     <br />
     <a href="https://discord.cyberious.xyz">💬 Discord</a>
@@ -21,6 +21,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 - Make a python virtual environment: `python3 -m venv venv`
 - Source the environment: `venv\Scripts\activate` (Windows) / `source venv/bin/activate` (macOS, Linux)
 - Install the requirements: `pip install -r requirements.txt`
+- Install chrominium: `patchright install chromium` / `python -m patchright install chromium`
 - Start: `Remove comments for testing in async and sync python files then run those`
 
 ---
@@ -69,6 +70,7 @@ v0.0.3 ⋮ 11/7/2024
 + Improved error handling and logging
 + Added concurrent processing support
 ```
+
 ---
 
 <p align="center">
