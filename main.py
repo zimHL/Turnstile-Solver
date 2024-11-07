@@ -1,24 +1,21 @@
-# Not tested might not work
-
 import asyncio
 from async_solver import get_turnstile_token as async_get_token
 from sync_solver import get_turnstile_token as sync_get_token
+    
+mode = input("Mode (sync/async): ").strip().lower()
+url = input("URL: ").strip()
+sitekey = input("Sitekey: ").strip()
 
-async def main():
-    mode = input("Mode (sync/async): ").strip().lower()
-    url = input("URL: ").strip()
-    sitekey = input("Sitekey: ").strip()
-    headless = input("Headless? (y/n): ").strip().lower() == "y"
+async def asynchronous():
+    result = await async_get_token(url=url, sitekey=sitekey)
+    print("Result:", result)
 
-    if mode == "async":
-        result = await async_get_token(headless=headless, url=url, sitekey=sitekey)
-    elif mode == "sync":
-        result = sync_get_token(headless=headless, url=url, sitekey=sitekey)
-    else:
-        print("Invalid mode.")
-        return
-
+def synchronous():
+    result = sync_get_token(url=url, sitekey=sitekey)
     print("Result:", result)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    if mode == "async":
+        asyncio.run(asynchronous())
+    else:
+        synchronous()
