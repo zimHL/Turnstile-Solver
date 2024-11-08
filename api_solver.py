@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional
 from dataclasses import dataclass
 from patchright.async_api import async_playwright
 from quart import Quart, request, jsonify
@@ -223,7 +223,8 @@ class TurnstileAPIServer:
                     <p class="text-blue-700">This project is inspired by 
                        <a href="https://github.com/Body-Alhoha/turnaround" class="text-blue-600 hover:underline">Turnaround</a> 
                        and is currently maintained by 
-                       <a href="https://github.com/Theyka" class="text-blue-600 hover:underline">Theyka</a>.</p>
+                       <a href="https://github.com/Theyka" class="text-blue-600 hover:underline">Theyka</a> 
+                       and <a href="https://github.com/sexfrance" class="text-blue-600 hover:underline">Sexfrance</a>.</p>
                 </div>
             </div>
         </body>

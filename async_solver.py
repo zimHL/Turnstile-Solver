@@ -2,7 +2,7 @@ import asyncio
 import time
 from typing import Dict, Optional
 from dataclasses import dataclass
-from patchright.async_api import async_playwright, Browser, Page, BrowserContext
+from patchright.async_api import async_playwright, Page, BrowserContext
 from logmagix import Logger, Loader
 
 @dataclass
@@ -61,7 +61,6 @@ class AsyncTurnstileSolver:
         await page.route(url_with_slash, lambda route: route.fulfill(body=page_data, status=200))
         await page.goto(url_with_slash)
 
-        # Set window dimensions
         if self.debug:
             self.log.debug("Getting window dimensions.")
         page.window_width = await page.evaluate("window.innerWidth")

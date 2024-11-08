@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Optional
+from typing import Dict
 from logmagix import Logger, Loader
 from sync_solver import get_turnstile_token as sync_solve
 from async_solver import get_turnstile_token as async_solve
