@@ -31,7 +31,7 @@ class TurnstileSolver:
     </html>
     """
 
-    def __init__(self, debug: bool = True):
+    def __init__(self, debug: bool = False):
         self.debug = debug
         self.log = Logger()
         self.loader = Loader(desc="Solving captcha...", timeout=0.05)

@@ -31,7 +31,7 @@ class TurnstileAPIServer:
     </html>
     """
 
-    def __init__(self, debug: bool = True):
+    def __init__(self, debug: bool = False):
         self.app = Quart(__name__)
         self.browser_lock = threading.Lock()
         self.log = Logger()
