@@ -1,11 +1,11 @@
-from typing import Optional
+from typing import Optional, List
 from dataclasses import dataclass
 from patchright.async_api import async_playwright
 from quart import Quart, request, jsonify
 from logmagix import Logger, Loader
-import threading
-import time
 import asyncio
+from collections import deque
+import time
 
 @dataclass
 class TurnstileAPIResult:
@@ -13,6 +13,51 @@ class TurnstileAPIResult:
     elapsed_time_seconds: Optional[float] = None
     status: str = "success"
     error: Optional[str] = None
+
+class PagePool:
+    def __init__(self, context, debug: bool = False, log=None):
+        self.context = context
+        self.min_size = 1
+        self.max_size = 10
+        self.available_pages: deque = deque()
+        self.in_use_pages: set = set()
+        self._lock = asyncio.Lock()
+        self.debug = debug
+        self.log = log
+    
+    async def initialize(self):
+        """Create initial pool of pages"""
+        for _ in range(self.min_size):
+            page = await self.context.new_page()
+            self.available_pages.append(page)
+    
+    async def get_page(self):
+        """Get an available page from the pool or create a new one if needed"""
+        async with self._lock:
+            if (not self.available_pages and 
+                len(self.in_use_pages) < self.max_size):
+                page = await self.context.new_page()
+                if self.debug:
+                    self.log.debug(f"Created new page. Total pages: {len(self.in_use_pages) + 1}")
+            else:
+                while not self.available_pages:
+                    await asyncio.sleep(0.1)
+                page = self.available_pages.popleft()
+            
+            self.in_use_pages.add(page)
+            return page
+    
+    async def return_page(self, page):
+        """Return a page to the pool or close it if we have too many"""
+        async with self._lock:
+            self.in_use_pages.remove(page)
+            total_pages = len(self.available_pages) + len(self.in_use_pages) + 1
+            if total_pages > self.min_size and len(self.available_pages) >= 2:
+                await page.close()
+                if self.debug:
+                    self.log.debug(f"Closed excess page. Total pages: {total_pages - 1}")
+            else:
+                self.available_pages.append(page)
 
 class TurnstileAPIServer:
     HTML_TEMPLATE = """
@@ -33,10 +78,11 @@ class TurnstileAPIServer:
 
     def __init__(self, debug: bool = False):
         self.app = Quart(__name__)
-        self.browser_lock = threading.Lock()
         self.log = Logger()
         self.debug = debug
-        self.page = None
+        self.page_pool = None
+        self.browser = None
+        self.context = None
         self.browser_args = [
             "--disable-blink-features=AutomationControlled",
             "--no-sandbox",
@@ -56,30 +102,35 @@ class TurnstileAPIServer:
         self.app.route('/')(self.index)
 
     async def _startup(self) -> None:
-        """Initialize the browser on startup."""
+        """Initialize the browser and page pool on startup."""
         self.log.debug("Starting browser initialization...")
         try:
             await self._initialize_browser()
-            self.log.success("Browser initialized successfully")
+            self.log.success("Browser and page pool initialized successfully")
         except Exception as e:
             self.log.failure(f"Failed to initialize browser: {str(e)}")
             raise
 
     async def _initialize_browser(self) -> None:
-        """Initialize the browser and create a new page."""
+        """Initialize the browser and create the page pool."""
         if self.debug:
             self.log.debug("Initializing browser with automation-resistant arguments...")
             
         playwright = await async_playwright().start()
-        browser = await playwright.chromium.launch(
+        self.browser = await playwright.chromium.launch(
             headless=False,
             args=self.browser_args
         )
-        context = await browser.new_context()
-        self.page = await context.new_page()
+        self.context = await self.browser.new_context()
+        self.page_pool = PagePool(
+            self.context,
+            debug=self.debug,
+            log=self.log
+        )
+        await self.page_pool.initialize()
         
         if self.debug:
-            self.log.debug("Browser and page initialized successfully")
+            self.log.debug(f"Browser and page pool initialized (min: {self.page_pool.min_size}, max: {self.page_pool.max_size})")
 
     async def _solve_turnstile(self, url: str, sitekey: str) -> TurnstileAPIResult:
         """Solve the Turnstile challenge."""
@@ -87,6 +138,7 @@ class TurnstileAPIServer:
         loader = Loader(desc="Solving captcha...", timeout=0.05)
         loader.start()
 
+        page = await self.page_pool.get_page()
         try:
             if self.debug:
                 self.log.debug(f"Starting Turnstile solve for URL: {url}")
@@ -96,14 +148,14 @@ class TurnstileAPIServer:
             turnstile_div = f'<div class="cf-turnstile" data-sitekey="{sitekey}"></div>'
             page_data = self.HTML_TEMPLATE.replace("<!-- cf turnstile -->", turnstile_div)
 
-            await self.page.route(url_with_slash, 
-                                lambda route: route.fulfill(body=page_data, status=200))
-            await self.page.goto(url_with_slash)
+            await page.route(url_with_slash, 
+                           lambda route: route.fulfill(body=page_data, status=200))
+            await page.goto(url_with_slash)
 
             if self.debug:
                 self.log.debug("Setting up Turnstile widget dimensions")
 
-            await self.page.eval_on_selector(
+            await page.eval_on_selector(
                 "//div[@class='cf-turnstile']", 
                 "el => el.style.width = '70px'"
             )
@@ -114,16 +166,16 @@ class TurnstileAPIServer:
             max_attempts = 10
             attempts = 0
             while attempts < max_attempts:
-                turnstile_check = await self.page.input_value("[name=cf-turnstile-response]")
+                turnstile_check = await page.input_value("[name=cf-turnstile-response]")
                 if turnstile_check == "":
                     if self.debug:
                         self.log.debug(f"Attempt {attempts + 1}: No Turnstile response yet")
                     
-                    await self.page.click("//div[@class='cf-turnstile']")
+                    await page.click("//div[@class='cf-turnstile']")
                     await asyncio.sleep(0.5)
                     attempts += 1
                 else:
-                    element = await self.page.query_selector("[name=cf-turnstile-response]")
+                    element = await page.query_selector("[name=cf-turnstile-response]")
                     if element:
                         value = await element.get_attribute("value")
                         elapsed_time = round(time.time() - start_time, 3)
@@ -162,7 +214,8 @@ class TurnstileAPIServer:
             loader.stop()
             if self.debug:
                 self.log.debug("Clearing page state")
-            await self.page.goto("about:blank")
+            await page.goto("about:blank")
+            await self.page_pool.return_page(page)
 
     async def process_turnstile(self):
         """Handle the /turnstile endpoint requests."""
@@ -176,20 +229,19 @@ class TurnstileAPIServer:
                 "error": "Both 'url' and 'sitekey' are required"
             }), 400
 
-        with self.browser_lock:
+        if self.debug:
+            self.log.debug(f"Processing request for URL: {url}")
+        try:
+            result = await self._solve_turnstile(url=url, sitekey=sitekey)
             if self.debug:
-                self.log.debug(f"Processing request for URL: {url}")
-            try:
-                result = await self._solve_turnstile(url=url, sitekey=sitekey)
-                if self.debug:
-                    self.log.debug(f"Request completed with status: {result.status}")
-                return jsonify(result.__dict__), 200 if result.status == "success" else 500
-            except Exception as e:
-                self.log.failure(f"Unexpected error processing request: {str(e)}")
-                return jsonify({
-                    "status": "error",
-                    "error": str(e)
-                }), 500
+                self.log.debug(f"Request completed with status: {result.status}")
+            return jsonify(result.__dict__), 200 if result.status == "success" else 500
+        except Exception as e:
+            self.log.failure(f"Unexpected error processing request: {str(e)}")
+            return jsonify({
+                "status": "error",
+                "error": str(e)
+            }), 500
 
     async def index(self):
         """Serve the API documentation page."""

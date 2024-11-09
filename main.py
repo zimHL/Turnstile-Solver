@@ -17,18 +17,17 @@ class TurnstileTester:
         self.log.info("2. Async Solver")
         self.log.info("3. API Server")
         
-        while True:
-            mode = input("\nEnter mode (1-3): ").strip()
-            if mode in ['1', '2', '3']:
-                break
+        mode = self.log.question("Enter mode (1-3): ")
+        while mode not in ['1', '2', '3']:
             self.log.warning("Invalid mode. Please enter 1, 2, or 3.")
+            mode = self.log.question("Enter mode (1-3): ")
 
         if mode == '3':
             return 'api', '', ''
 
         self.log.info("\nEnter Turnstile details:")
-        url = input("URL: ").strip()
-        sitekey = input("Sitekey: ").strip()
+        url = self.log.question("URL: ")
+        sitekey = self.log.question("Sitekey: ")
 
         return {
             '1': 'sync',
@@ -64,13 +63,16 @@ class TurnstileTester:
         finally:
             self.loader.stop()
 
-    def run_api_server(self) -> None:
+    async def run_api_server(self) -> None:
         """Run the API server with logging."""
         self.log.info("Starting API server on http://localhost:5000")
         self.log.info("API documentation available at http://localhost:5000/")
         try:
             app = create_app()
-            app.run(host="127.0.0.1", port=5000, debug=True)
+            import hypercorn.asyncio
+            config = hypercorn.Config()
+            config.bind = ["127.0.0.1:5000"]
+            await hypercorn.asyncio.serve(app, config)
         except Exception as e:
             self.log.failure(f"API server failed to start: {str(e)}")
 
@@ -82,7 +84,7 @@ class TurnstileTester:
             mode, url, sitekey = self._get_user_input()
 
             if mode == 'api':
-                self.run_api_server()
+                await self.run_api_server()
             else:
                 if not url or not sitekey:
                     self.log.failure("URL and sitekey are required")

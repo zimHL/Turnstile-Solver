@@ -1,3 +1,4 @@
 logmagix==1.10.0
 patchright
 quart
+hypercorn
