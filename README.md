@@ -5,7 +5,6 @@
 A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6 seconds solve time). The script uses patchright library to interact with web pages and solve the challenges without running additional browser instances.
     <br />
     <br />
-    ·
     <a href="https://github.com/sexfrance/Turnstile-Solver#-changelog">📜 ChangeLog</a>
     ·
     <a href="https://github.com/sexfrance/Turnstile-Solver/issues">⚠️ Report Bug</a>
