@@ -1,92 +1,111 @@
-from patchright.async_api import async_playwright
-from quart import Quart, request, jsonify
-import threading
+import asyncio
+from typing import Dict
+from logmagix import Logger, Loader
+from sync_solver import get_turnstile_token as sync_solve
+from async_solver import get_turnstile_token as async_solve
+from api_solver import create_app
 
-app = Quart(__name__)
+class TurnstileTester:
+    def __init__(self):
+        self.log = Logger()
+        self.loader = Loader(desc="Processing...", timeout=0.05)
 
-browser_lock = threading.Lock()
+    def _get_user_input(self) -> tuple[str, str, str]:
+        """Get user input for solver configuration."""
+        self.log.info("Select solver mode:")
+        self.log.info("1. Sync Solver")
+        self.log.info("2. Async Solver")
+        self.log.info("3. API Server")
+        
+        mode = self.log.question("Enter mode (1-3): ")
+        while mode not in ['1', '2', '3']:
+            self.log.warning("Invalid mode. Please enter 1, 2, or 3.")
+            mode = self.log.question("Enter mode (1-3): ")
 
+        if mode == '3':
+            return 'api', '', ''
 
-async def run_browser():
-    global page
-    playwright = await async_playwright().start()
-    browser = await playwright.chromium.launch(
-        headless=False,
-        args=[
-            "--disable-blink-features=AutomationControlled",
-        ]
-    )
-    context = await browser.new_context()
-    page = await context.new_page()
+        self.log.info("\nEnter Turnstile details:")
+        url = self.log.question("URL: ")
+        sitekey = self.log.question("Sitekey: ")
 
+        return {
+            '1': 'sync',
+            '2': 'async',
+            '3': 'api'
+        }[mode], url, sitekey
 
-@app.before_serving
-async def startup():
-    await run_browser()
-
-
-async def main(url=None, sitekey=None):
-    url = url + "/" if not url.endswith("/") else url
-
-    with open("page.html") as f:
-        page_data = f.read()
-    stub = f"<div class=\"cf-turnstile\" data-sitekey=\"{sitekey}\"></div>"
-    page_data = page_data.replace("<!-- cf turnstile -->", stub)
-
-
-    await page.route(url, lambda route: route.fulfill(body=page_data, status=200))
-
-
-    await page.goto(url)
-
-    await page.eval_on_selector("//div[@class='cf-turnstile']", "el => el.style.width = '70px'")
-
-    while True:
-        turnstile_check = await page.input_value("[name=cf-turnstile-response]")
-        if turnstile_check == "":
-            await page.click("//div[@class='cf-turnstile']")
-        else:
-            element = await page.query_selector("[name=cf-turnstile-response]")
-            turnstile_value = await element.get_attribute("value") if element else None
-            break
-
-    result = {
-        "result": turnstile_value
-    }
-    await page.goto("about:blank")
-
-    return result
-
-
-@app.route('/turnstile', methods=['GET'])
-async def process_turnstile():
-    url = request.args.get('url')
-    sitekey = request.args.get('sitekey')
-
-    if not url or not sitekey:
-        return jsonify({"error": "Both 'url' and 'sitekey' are required"}), 400
-
-    with browser_lock:
+    def run_sync_solver(self, url: str, sitekey: str) -> Dict:
+        """Run the synchronous solver with logging."""
+        self.log.debug(f"Starting sync solver for {url}")
+        self.loader.start()
         try:
-            turnstile_solver = await main(url=url, sitekey=sitekey)
-            return jsonify(turnstile_solver), 200
+            result = sync_solve(url=url, sitekey=sitekey, headless=False)
+            if result.get('status') == 'success':
+                self.log.success("Sync solver completed successfully")
+            else:
+                self.log.failure("Sync solver failed")
+            return result
+        finally:
+            self.loader.stop()
+
+    async def run_async_solver(self, url: str, sitekey: str) -> Dict:
+        """Run the asynchronous solver with logging."""
+        self.log.debug(f"Starting async solver for {url}")
+        self.loader.start()
+        try:
+            result = await async_solve(url=url, sitekey=sitekey, headless=False)
+            if result.get('status') == 'success':
+                self.log.success("Async solver completed successfully")
+            else:
+                self.log.failure("Async solver failed")
+            return result
+        finally:
+            self.loader.stop()
+
+    async def run_api_server(self) -> None:
+        """Run the API server with logging."""
+        self.log.info("Starting API server on http://localhost:5000")
+        self.log.info("API documentation available at http://localhost:5000/")
+        try:
+            app = create_app()
+            import hypercorn.asyncio
+            config = hypercorn.Config()
+            config.bind = ["127.0.0.1:5000"]
+            await hypercorn.asyncio.serve(app, config)
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            self.log.failure(f"API server failed to start: {str(e)}")
 
+    async def main(self):
+        """Main execution flow with proper logging."""
+        self.log.message("Turnstile", "Welcome to Turnstile Solver Tester")
+        
+        try:
+            mode, url, sitekey = self._get_user_input()
 
-@app.route('/')
-async def index():
-    return """
-    <h1>Welcome to Turnstile Solver API</h1>
-    <p>To use the turnstile service, send a GET request to <code>/turnstile</code> with the following query parameters:</p>
-    <p>This project is inspired by <a href="https://github.com/Body-Alhoha/turnaround">Turnaround</a> and is currently maintained by <a href="https://github.com/Theyka">Theyka</a>.</p>
-    <ul>
-        <li><strong>url</strong>: The URL where Turnstile is to be validated</li>
-        <li><strong>sitekey</strong>: The site key for Turnstile</li>
-    </ul>
-    <p>Example usage: <code>/turnstile?url=https://example.com&sitekey=sitekey</code></p>
-    """
+            if mode == 'api':
+                await self.run_api_server()
+            else:
+                if not url or not sitekey:
+                    self.log.failure("URL and sitekey are required")
+                    return
 
+                if mode == 'sync':
+                    result = self.run_sync_solver(url, sitekey)
+                else:  # async
+                    result = await self.run_async_solver(url, sitekey)
 
-if __name__ == '__main__':
-    app.run()
+                self.log.debug("Result details:")
+                for key, value in result.items():
+                    self.log.debug(f"{key}: {value}")
+
+        except KeyboardInterrupt:
+            self.log.warning("\nOperation cancelled by user")
+        except Exception as e:
+            self.log.failure(f"An error occurred: {str(e)}")
+        finally:
+            self.log.message("Turnstile", "Testing completed")
+
+if __name__ == "__main__":
+    tester = TurnstileTester()
+    asyncio.run(tester.main())
