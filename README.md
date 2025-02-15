@@ -36,12 +36,6 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 
 ---
 
-#### 📹 Preview
-
-![Preview](https://i.imgur.com/YI6RZ5P.gif)
-
----
-
 ### ❗ Disclaimers
 
 - I am not responsible for anything that may happen, such as API Blocking, IP ban, etc.
@@ -55,7 +49,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 v0.0.1 ⋮ 21/10/2024
 ! Initial release
 
-v0.0.2 ⋮ 10/28/2024
+v0.0.2 ⋮ 28/10/2024
 ! Modified the script, page.html is now in the scripts
 ! Made it faster and less resource intensive
 ! Modified the sync logic and made an async version
@@ -67,6 +61,12 @@ v0.0.3 ⋮ 11/7/2024
 + Added web interface for API documentation
 + Improved error handling and logging
 + Added concurrent processing support
+
+v0.0.4 ⋮ 15/2/2025
++ Added --headless argument (Default: False | Accepts: True/False | Requires --useragent to be set)
++ Added --debug argument (Default: False | Accepts: True/False)
++ Added --useragent argument (Default: None | Accepts: Chrome User-Agent, e.g., --useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
+! Modified logging method to use the logging library
 ```
 
 ---
