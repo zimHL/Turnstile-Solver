@@ -342,8 +342,11 @@ def create_app(debug: bool, headless: bool, useragent: Optional[str] = None) -> 
 if __name__ == '__main__':
     args = parse_args()
 
-    app = create_app(debug=args.debug, headless=args.headless, useragent=args.useragent)
-    app.run()
+    if args.headless is True and args.useragent is None:
+        logger.error('You must specify a useragent for Turnstile Solver')
+    else:
+        app = create_app(debug=args.debug, headless=args.headless, useragent=args.useragent)
+        app.run()
 
 # Credits for the changes: github.com/sexfrance
 # Credit for the original script: github.com/Theyka
