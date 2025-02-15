@@ -1,8 +1,10 @@
+import sys
 import time
+import logging
 from typing import Dict, Optional
 from dataclasses import dataclass
 from patchright.sync_api import sync_playwright, Page, BrowserContext
-from logmagix import Logger, Loader
+
 
 @dataclass
 class TurnstileResult:
@@ -10,6 +12,44 @@ class TurnstileResult:
     elapsed_time_seconds: float
     status: str
     reason: Optional[str] = None
+
+
+class CustomLogger(logging.Logger):
+    COLORS = {
+        'DEBUG': '\033[35m',  # Magenta
+        'INFO': '\033[34m',  # Blue
+        'SUCCESS': '\033[32m',  # Green
+        'WARNING': '\033[33m',  # Yellow
+        'ERROR': '\033[31m',  # Red
+    }
+    RESET = '\033[0m'  # Reset color
+
+    def format_message(self, level, message):
+        timestamp = time.strftime('%H:%M:%S')
+        return f"[{timestamp}] [{self.COLORS.get(level, '')}{level}{self.RESET}] -> {message}"
+
+    def debug(self, message, *args, **kwargs):
+        super().debug(self.format_message('DEBUG', message), *args, **kwargs)
+
+    def info(self, message, *args, **kwargs):
+        super().info(self.format_message('INFO', message), *args, **kwargs)
+
+    def success(self, message, *args, **kwargs):
+        super().info(self.format_message('SUCCESS', message), *args, **kwargs)
+
+    def warning(self, message, *args, **kwargs):
+        super().warning(self.format_message('WARNING', message), *args, **kwargs)
+
+    def error(self, message, *args, **kwargs):
+        super().error(self.format_message('ERROR', message), *args, **kwargs)
+
+
+logging.setLoggerClass(CustomLogger)
+logger = logging.getLogger("TurnstileSolver")
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler(sys.stdout)
+logger.addHandler(handler)
+
 
 class TurnstileSolver:
     HTML_TEMPLATE = """
@@ -31,51 +71,47 @@ class TurnstileSolver:
     </html>
     """
 
-    def __init__(self, debug: bool = False):
+    def __init__(self, debug: bool = False, headless: Optional[bool] = None, useragent: Optional[str] = None):
         self.debug = debug
-        self.log = Logger()
-        self.loader = Loader(desc="Solving captcha...", timeout=0.05)
+        self.headless = headless if headless is not None else False
+        self.useragent = useragent
         self.browser_args = [
             "--disable-blink-features=AutomationControlled",
-            "--no-sandbox",
-            "--disable-dev-shm-usage",
-            "--disable-background-networking",
-            "--disable-background-timer-throttling",
-            "--disable-backgrounding-occluded-windows",
-            "--disable-renderer-backgrounding",
-            "--window-position=2000,2000",
         ]
+
+        if self.useragent:
+            self.browser_args.append(f"--user-agent={self.useragent}")
 
     def _setup_page(self, context: BrowserContext, url: str, sitekey: str) -> Page:
         """Set up the page with Turnstile widget."""
         page = context.new_page()
         url_with_slash = url + "/" if not url.endswith("/") else url
-        
+
         if self.debug:
-            self.log.debug(f"Navigating to URL: {url_with_slash}")
+            logger.debug(f"Navigating to URL: {url_with_slash}")
 
         turnstile_div = f'<div class="cf-turnstile" data-sitekey="{sitekey}"></div>'
         page_data = self.HTML_TEMPLATE.replace("<!-- cf turnstile -->", turnstile_div)
-        
+
         page.route(url_with_slash, lambda route: route.fulfill(body=page_data, status=200))
         page.goto(url_with_slash)
-        
+
         return page
 
     def _get_turnstile_response(self, page: Page, max_attempts: int = 10) -> Optional[str]:
         """Attempt to retrieve Turnstile response."""
         attempts = 0
-        
+
         while attempts < max_attempts:
             turnstile_check = page.eval_on_selector(
-                "[name=cf-turnstile-response]", 
+                "[name=cf-turnstile-response]",
                 "el => el.value"
             )
 
             if turnstile_check == "":
                 if self.debug:
-                    self.log.debug(f"Attempt {attempts + 1}: No Turnstile response yet.")
-                
+                    logger.debug(f"Attempt {attempts + 1}: No Turnstile response yet.")
+
                 page.evaluate("document.querySelector('.cf-turnstile').style.width = '70px'")
                 page.click(".cf-turnstile")
                 time.sleep(0.5)
@@ -85,34 +121,33 @@ class TurnstileSolver:
                 if turnstile_element:
                     return turnstile_element.get_attribute("value")
                 break
-        
+
         return None
 
-    def solve(self, url: str, sitekey: str, headless: bool = False) -> TurnstileResult:
+    def solve(self, url: str, sitekey: str) -> TurnstileResult:
         """
         Solve the Turnstile challenge and return the result.
-        
+
         Args:
             url: The URL where the Turnstile challenge is hosted
             sitekey: The Turnstile sitekey
             headless: Whether to run the browser in headless mode
-            
+
         Returns:
             TurnstileResult object containing the solution details
         """
-        self.loader.start()
         start_time = time.time()
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=headless, args=self.browser_args)
+            browser = playwright.chromium.launch(headless=self.headless, args=self.browser_args)
             context = browser.new_context()
 
             try:
                 page = self._setup_page(context, url, sitekey)
                 turnstile_value = self._get_turnstile_response(page)
-                
+
                 elapsed_time = round(time.time() - start_time, 3)
-                
+
                 if not turnstile_value:
                     result = TurnstileResult(
                         turnstile_value=None,
@@ -120,44 +155,37 @@ class TurnstileSolver:
                         status="failure",
                         reason="Max attempts reached without token retrieval"
                     )
-                    self.log.failure("Failed to retrieve Turnstile value.")
+                    logger.error("Failed to retrieve Turnstile value.")
                 else:
                     result = TurnstileResult(
                         turnstile_value=turnstile_value,
                         elapsed_time_seconds=elapsed_time,
                         status="success"
                     )
-                    self.log.message(
-                        "Cloudflare",
-                        f"Successfully solved captcha: {turnstile_value[:45]}...",
-                        start=start_time,
-                        end=time.time()
-                    )
+                    logger.success(f"Successfully solved captcha: {turnstile_value[:45]}... in {elapsed_time} seconds")
 
             finally:
                 context.close()
                 browser.close()
-                self.loader.stop()
 
                 if self.debug:
-                    self.log.debug(f"Elapsed time: {result.elapsed_time_seconds} seconds")
-                    self.log.debug("Browser closed. Returning result.")
+                    logger.debug(f"Elapsed time: {result.elapsed_time_seconds} seconds")
+                    logger.debug("Browser closed. Returning result.")
 
         return result
 
-def get_turnstile_token(headless: bool = False, url: str = None, sitekey: str = None) -> Dict:
+
+def get_turnstile_token(url: str, sitekey: str, headless: bool = False) -> Dict:
     """Legacy wrapper function for backward compatibility."""
-    solver = TurnstileSolver()
-    result = solver.solve(url=url, sitekey=sitekey, headless=headless)
+    solver = TurnstileSolver(debug=True, headless=headless)
+    result = solver.solve(url=url, sitekey=sitekey)
     return result.__dict__
+
+
 
 if __name__ == "__main__":
     result = get_turnstile_token(
-        headless=False,
         url="https://bypass.city/",
         sitekey="0x4AAAAAAAGzw6rXeQWJ_y2P"
     )
     print(result)
-
-# Credits for the changes: github.com/sexfrance
-# Credit for the original script: github.com/Theyka
