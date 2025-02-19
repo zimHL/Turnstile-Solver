@@ -177,7 +177,7 @@ class TurnstileAPIServer:
         if self.debug:
             logger.debug(f"Browser and page pool initialized (min: {self.page_pool.min_size}, max: {self.page_pool.max_size})")
 
-    async def _solve_turnstile(self, url: str, sitekey: str) -> TurnstileAPIResult:
+    async def _solve_turnstile(self, url: str, sitekey: str,  action: str = None, cdata: str = None) -> TurnstileAPIResult:
         """Solve the Turnstile challenge."""
         start_time = time.time()
 
@@ -188,7 +188,7 @@ class TurnstileAPIServer:
                 logger.debug("Setting up page data and route")
 
             url_with_slash = url + "/" if not url.endswith("/") else url
-            turnstile_div = f'<div class="cf-turnstile" data-sitekey="{sitekey}"></div>'
+            turnstile_div = f'<div class="cf-turnstile" data-sitekey="{sitekey}"' + (f' data-action="{action}"' if action else '') + (f' data-cdata="{cdata}"' if cdata else '') + '></div>'
             page_data = self.HTML_TEMPLATE.replace("<!-- cf turnstile -->", turnstile_div)
 
             await page.route(url_with_slash, lambda route: route.fulfill(body=page_data, status=200))
@@ -260,6 +260,8 @@ class TurnstileAPIServer:
         """Handle the /turnstile endpoint requests."""
         url = request.args.get('url')
         sitekey = request.args.get('sitekey')
+        action = request.args.get('action')
+        cdata = request.args.get('cdata')
 
         if not url or not sitekey:
             logger.warning("Missing required parameters: 'url' or 'sitekey'")
@@ -271,7 +273,7 @@ class TurnstileAPIServer:
         if self.debug:
             logger.debug(f"Processing request for URL: {url}")
         try:
-            result = await self._solve_turnstile(url=url, sitekey=sitekey)
+            result = await self._solve_turnstile(url=url, sitekey=sitekey, action=action, cdata=cdata)
             if self.debug:
                 logger.debug(f"Request completed with status: {result.status}")
             return jsonify(result.__dict__), 200 if result.status == "success" else 500
