@@ -67,6 +67,10 @@ v0.0.4 ⋮ 15/2/2025
 + Added --debug argument (Default: False | Accepts: True/False)
 + Added --useragent argument (Default: None | Accepts: Chrome User-Agent, e.g., --useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
 ! Modified logging method to use the logging library
+
+v0.0.5 ⋮ 19/02/2025  
++ Added optional action and cData parameters, similar to sitekey and url (e.g., /turnstile?url=&sitekey=&action=&cdata=).  
+
 ```
 
 ---
