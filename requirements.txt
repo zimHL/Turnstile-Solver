@@ -1,7 +1,4 @@
-sys
 quart
-logging
 asyncio
 argparse
 patchright
-playwright
