@@ -51,10 +51,28 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 | `--headless`   | `False`  | `boolean` | Runs the browser in headless mode. Requires the `--useragent` argument to be set.             |
 | `--useragent`  | `None`   | `string`  | Specifies a custom User-Agent string for the browser.                                        |
 | `--debug`      | `False`  | `boolean` | Enables or disables debug mode for additional logging and troubleshooting.                   |
-| `--persistent` | `False`  | `boolean` | Enables a persistent browser context for better session handling and improved security.      |
+| `--persistent` | `False`  | `boolean` | Enables a persistent browser context.      |
 | `--thread`     | `1`      | `integer` | Sets the number of browser threads to use in multi-threaded mode.                           |
 | `--host`       | `127.0.0.1` | `string`  | Specifies the IP address the API solver runs on.                                            |
 | `--port`       | `5000`   | `integer` | Sets the port the API solver listens on.                                                    |
+
+---
+
+### 🐳 Docker Image
+#### Running the Container
+To start the container, use:
+- Change the TZ environment variable and ports to the correct one for yourself:
+```sh
+docker run -d -p 3389:3389 -p 5000:5000 -e TZ=Asia/Baku --name turnstile_solver turnstile_solver:latest
+```
+
+#### Connecting to the Container
+1. Use an **RDP client** (like Windows Remote Desktop, Remmina, or FreeRDP)
+2. Connect to `localhost:3389`
+3. Login with the default user:
+   - **Username:** root
+   - **Password:** root
+4. After this, you can start the solver by navigating to the `Turnstile-Solver` folder.
 
 ---
 
