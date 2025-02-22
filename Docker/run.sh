@@ -27,6 +27,11 @@ else
     usermod -aG sudo root || { echo "Failed to add user to sudo."; exit 1; }
 fi
 
+if [ -n "$TZ" ]; then
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
+    echo $TZ > /etc/timezone
+fi
+
 mkdir -p /root/Desktop
 
 cd /root/Desktop || { echo "Failed to change directory to /root/Desktop"; exit 1; }
