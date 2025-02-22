@@ -63,7 +63,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 To start the container, use:
 - Change the TZ environment variable and ports to the correct one for yourself:
 ```sh
-docker run -d -p 3389:3389 -p 5000:5000 -e TZ=Asia/Baku --name turnstile_solver turnstile_solver:latest
+docker run -d -p 3389:3389 -p 5000:5000 -e TZ=Asia/Baku --name turnstile_solver theyka/turnstile_solver:latest
 ```
 
 #### Connecting to the Container
