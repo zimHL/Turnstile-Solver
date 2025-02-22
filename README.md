@@ -81,8 +81,6 @@ If the request is successfully received, the server will respond with a `task_id
 }
 ```
 
----
-
 #### Get Result
 ```http
   GET /result?id=f0dbe75b-fa76-41ad-89aa-4d3a392040af
@@ -132,7 +130,7 @@ v0.1.1 ⋮ 15/2/2025
 ! Modified logging method to use the logging library
 
 v0.1.2 ⋮ 19/02/2025  
-+ Added optional action and cData parameters, similar to sitekey and url (e.g., /turnstile?url=&sitekey=&action=&cdata=).  
++ Added optional action and cData parameters, similar to sitekey and url.
 
 v0.1.3 ⋮ 22/02/2025  
 + Added persistent context browser for improved security
