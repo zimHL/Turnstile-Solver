@@ -149,7 +149,7 @@ class TurnstileAPIServer:
 
     async def _solve_turnstile(self, task_id: str, url: str, sitekey: str, action: str = None, cdata: str = None):
         """Solve the Turnstile challenge."""
-        
+
         browser, context, page = await self.browser_pool.get()
         start_time = time.time()
 
@@ -309,14 +309,14 @@ def parse_args():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="Turnstile API Server")
 
-    parser.add_argument('--headless', type=bool, default=False, help='Run browser in headless mode (default: False)')
-    parser.add_argument('--useragent', type=str, default=None, help='Set custom user agent for the browser')
-    parser.add_argument('--debug', type=str, default=False, help='Enable/Disable debug mode (default: False)')
-    parser.add_argument('--persistent', type=bool, default=False, help='Uses persistent context browser (default: False)')
-    parser.add_argument('--thread', type=int, default=1, help='Number of browser threads to use in multi-threaded mode (default: 1)')
+    parser.add_argument('--headless', type=bool, default=False, help='Run the browser in headless mode, without opening a graphical interface. This option requires the --useragent argument to be set (default: False)')
+    parser.add_argument('--useragent', type=str, default=None, help='Specify a custom User-Agent string for the browser. If not provided, the default User-Agent is used')
+    parser.add_argument('--debug', type=bool, default=False, help='Enable or disable debug mode for additional logging and troubleshooting information (default: False)')
+    parser.add_argument('--persistent', type=bool, default=False, help='Enable persistent context browser for better session handling and improved security (default: False)')
+    parser.add_argument('--thread', type=int, default=1, help='Set the number of browser threads to use for multi-threaded mode. Increasing this will speed up execution but requires more resources (default: 1)')
 
-    parser.add_argument('--host', type=str, default='127.0.0.1', help='Change ip that api solver runs on (default: 127.0.0.1)')
-    parser.add_argument('--port', type=str, default='5000', help='Change port that api solver runs on (default: 5000)')
+    parser.add_argument('--host', type=str, default='127.0.0.1', help='Specify the IP address where the API solver runs. (Default: 127.0.0.1)')
+    parser.add_argument('--port', type=str, default='5000', help='Set the port for the API solver to listen on. (Default: 5000)')
     return parser.parse_args()
 
 
