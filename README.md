@@ -15,7 +15,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 
 ---
 
-## ⚙️ Installation
+### ⚙️ Installation
 - Requires: `Python 3.8+`
 - Make a python virtual environment: `python3 -m venv venv`
 - Source the environment: `venv\Scripts\activate` (Windows) / `source venv/bin/activate` (macOS, Linux)
@@ -25,7 +25,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 
 ---
 
-## 🔥 Features
+### 🔥 Features
 - **Debug Logging**: Detailed debug logs track actions and progress, making troubleshooting straightforward.
 - **Automated CAPTCHA Solver**: Uses Playwright to launch a browser, navigate to the target page, and dynamically injects a CAPTCHA solver.
 - **Multi-threaded Mode**: Supports multi-threaded execution, allowing multiple browser instances to run concurrently, speeding up processing.
@@ -39,13 +39,13 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 
 ---
 
-## ❗ Disclaimers
+### ❗ Disclaimers
 - I am not responsible for anything that may happen, such as API Blocking, IP ban, etc.
 - This was a quick project that was made for fun and personal use if you want to see further updates, star the repo & create an "issue" [here](https://github.com/Theyka/Turnstile-Solver/issues/)
 
 ---
 
-## 🔧 Command line arguments
+### 🔧 Command line arguments
 | Parameter     | Default   | Type      | Description                                                                                   |
 |--------------|-----------|-----------|-----------------------------------------------------------------------------------------------|
 | `--headless`   | `False`  | `boolean` | Runs the browser in headless mode. Requires the `--useragent` argument to be set.             |
@@ -58,7 +58,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 
 ---
 
-## 📡 API Documentation
+### 📡 API Documentation
 #### Solve turnstile
 ```http
   GET /turnstile?url=https://example.com&sitekey=0x4AAAAAAA
@@ -107,7 +107,7 @@ If the CAPTCHA is solved successfully, the server will respond with the followin
 
 ---
 
-## 📜 ChangeLog
+### 📜 ChangeLog
 ```diff
 v0.0.1 ⋮ 21/10/2024
 ! Initial release
