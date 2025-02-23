@@ -200,6 +200,9 @@ v0.1.3 ⋮ 22/02/2025
 + Added persistent context browser for improved security
 + Implemented multi-threaded mode for enhanced performance
 + Added method to configure host and port for API server
+
+v0.2.0 ⋮ 24/02/2025  
++ Added Camoufox support
 ```
 
 ---
