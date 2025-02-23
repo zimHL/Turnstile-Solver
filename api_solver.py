@@ -9,6 +9,7 @@ import logging
 import asyncio
 import argparse
 from quart import Quart, request, jsonify
+from camoufox.async_api import AsyncCamoufox
 from patchright.async_api import async_playwright
 
 
@@ -66,11 +67,11 @@ class TurnstileAPIServer:
     </html>
     """
 
-    def __init__(self, headless: bool, useragent: str, debug: bool, persistent: bool, thread: int):
+    def __init__(self, headless: bool, useragent: str, debug: bool, browser_type: str, thread: int):
         self.app = Quart(__name__)
         self.debug = debug
         self.results = self._load_results()
-        self.persistent = persistent
+        self.browser_type = browser_type
         self.headless = headless
         self.useragent = useragent
         self.thread_count = thread
@@ -122,27 +123,37 @@ class TurnstileAPIServer:
         if self.debug:
             logger.debug("Initializing browser with arguments...")
 
-        playwright = await async_playwright().start()
+        if self.browser_type == "chromium" or self.browser_type == "chrome":
+            playwright = await async_playwright().start()
+        elif self.browser_type == "camoufox":
+            camoufox = AsyncCamoufox(headless=self.headless)
+
         for _ in range(self.thread_count):
-            if self.persistent:
+            if self.browser_type == "chromium":
+                browser = await playwright.chromium.launch(
+                    headless=self.headless,
+                    args=self.browser_args
+                )
+
+                page = await browser.new_page()
+
+            elif self.browser_type == "chrome":
                 browser = await playwright.chromium.launch_persistent_context(
                     user_data_dir=f"{os.getcwd()}/tmp/turnstile-chrome-{''.join(random.choices(string.ascii_letters + string.digits, k=10))}",
                     channel="chrome",
                     headless=self.headless,
                     no_viewport=True,
                 )
-                context = None
                 page = browser.pages[0]
+
+            elif self.browser_type == "camoufox":
+                browser = await camoufox.start()
+                page = await browser.new_page()
             else:
-                browser = await playwright.chromium.launch(
-                    headless=self.headless,
-                    args=self.browser_args
-                )
+                logger.error(f"Unknown browser type: {self.browser_type}")
+                sys.exit(1)
 
-                context = await browser.new_context()
-                page = await context.new_page()
-
-            await self.browser_pool.put((browser, context, page))
+            await self.browser_pool.put((browser, page))
 
         logger.debug(f"Browser pool initialized with {self.browser_pool.qsize()} browsers")
 
@@ -150,7 +161,7 @@ class TurnstileAPIServer:
     async def _solve_turnstile(self, task_id: str, url: str, sitekey: str, action: str = None, cdata: str = None):
         """Solve the Turnstile challenge."""
 
-        browser, context, page = await self.browser_pool.get()
+        browser, page = await self.browser_pool.get()
         start_time = time.time()
 
         try:
@@ -176,15 +187,12 @@ class TurnstileAPIServer:
             if self.debug:
                 logger.debug("Starting Turnstile response retrieval loop")
 
-            max_attempts = 10
-            attempts = 0
-            while attempts < max_attempts:
+            for _ in range(10):
                 try:
                     turnstile_check = await page.input_value("[name=cf-turnstile-response]")
                     if turnstile_check == "":
-                        attempts += 1
                         if self.debug:
-                            logger.debug(f"Attempt {attempts + 1}: No Turnstile response yet")
+                            logger.debug(f"Attempt {_}: No Turnstile response yet")
 
                         await page.click("//div[@class='cf-turnstile']", timeout=3000)
                         await asyncio.sleep(0.5)
@@ -214,7 +222,7 @@ class TurnstileAPIServer:
             if self.debug:
                 logger.debug("Clearing page state")
             await page.goto("about:blank")
-            await self.browser_pool.put((browser, context, page))
+            await self.browser_pool.put((browser, page))
 
     async def process_turnstile(self):
         """Handle the /turnstile endpoint requests."""
@@ -312,27 +320,23 @@ def parse_args():
     parser.add_argument('--headless', type=bool, default=False, help='Run the browser in headless mode, without opening a graphical interface. This option requires the --useragent argument to be set (default: False)')
     parser.add_argument('--useragent', type=str, default=None, help='Specify a custom User-Agent string for the browser. If not provided, the default User-Agent is used')
     parser.add_argument('--debug', type=bool, default=False, help='Enable or disable debug mode for additional logging and troubleshooting information (default: False)')
-    parser.add_argument('--persistent', type=bool, default=False, help='Enable persistent context browser for better session handling and improved security (default: False)')
+    parser.add_argument('--browser_type', type=str, default='chromium', help='Specify the browser type for the solver. Supported options: chromium, chrome, camoufox (default: chromium)')
     parser.add_argument('--thread', type=int, default=1, help='Set the number of browser threads to use for multi-threaded mode. Increasing this will speed up execution but requires more resources (default: 1)')
-
     parser.add_argument('--host', type=str, default='127.0.0.1', help='Specify the IP address where the API solver runs. (Default: 127.0.0.1)')
     parser.add_argument('--port', type=str, default='5000', help='Set the port for the API solver to listen on. (Default: 5000)')
     return parser.parse_args()
 
 
-def create_app(headless: bool, useragent: str, debug: bool, persistent: bool, thread: int) -> Quart:
-    server = TurnstileAPIServer(headless=headless, useragent=useragent, debug=debug, persistent=persistent, thread=thread)
+def create_app(headless: bool, useragent: str, debug: bool, browser_type: str, thread: int) -> Quart:
+    server = TurnstileAPIServer(headless=headless, useragent=useragent, debug=debug, browser_type=browser_type, thread=thread)
     return server.app
 
 
 if __name__ == '__main__':
     args = parse_args()
 
-    if args.headless is True and args.useragent is None:
+    if args.headless is True and args.useragent is None and "camoufox" not in args.browser_type:
         logger.error('You must specify a useragent for Turnstile Solver')
     else:
-        app = create_app(headless=args.headless, useragent=args.useragent, debug=args.debug, persistent=args.persistent, thread=args.thread)
+        app = create_app(headless=args.headless, useragent=args.useragent, debug=args.debug, browser_type=args.browser_type, thread=args.thread)
         app.run(host=args.host, port=int(args.port))
-
-# Credits for the changes: github.com/sexfrance
-# Credit for the original script: github.com/Theyka
