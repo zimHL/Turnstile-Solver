@@ -12,35 +12,36 @@ from quart import Quart, request, jsonify
 from camoufox.async_api import AsyncCamoufox
 from patchright.async_api import async_playwright
 
+COLORS = {
+    'MAGENTA': '\033[35m',
+    'BLUE': '\033[34m',
+    'GREEN': '\033[32m',
+    'YELLOW': '\033[33m',
+    'RED': '\033[31m',
+    'RESET': '\033[0m',
+}
+
 
 class CustomLogger(logging.Logger):
-    COLORS = {
-        'DEBUG': '\033[35m',  # Magenta
-        'INFO': '\033[34m',  # Blue
-        'SUCCESS': '\033[32m',  # Green
-        'WARNING': '\033[33m',  # Yellow
-        'ERROR': '\033[31m',  # Red
-    }
-    RESET = '\033[0m'  # Reset color
-
-    def format_message(self, level, message):
+    @staticmethod
+    def format_message(level, color, message):
         timestamp = time.strftime('%H:%M:%S')
-        return f"[{timestamp}] [{self.COLORS.get(level, '')}{level}{self.RESET}] -> {message}"
+        return f"[{timestamp}] [{COLORS.get(color)}{level}{COLORS.get('RESET')}] -> {message}"
 
     def debug(self, message, *args, **kwargs):
-        super().debug(self.format_message('DEBUG', message), *args, **kwargs)
+        super().debug(self.format_message('DEBUG', 'MAGENTA', message), *args, **kwargs)
 
     def info(self, message, *args, **kwargs):
-        super().info(self.format_message('INFO', message), *args, **kwargs)
+        super().info(self.format_message('INFO', 'BLUE', message), *args, **kwargs)
 
     def success(self, message, *args, **kwargs):
-        super().info(self.format_message('SUCCESS', message), *args, **kwargs)
+        super().info(self.format_message('SUCCESS', 'GREEN', message), *args, **kwargs)
 
     def warning(self, message, *args, **kwargs):
-        super().warning(self.format_message('WARNING', message), *args, **kwargs)
+        super().warning(self.format_message('WARNING', 'YELLOW', message), *args, **kwargs)
 
     def error(self, message, *args, **kwargs):
-        super().error(self.format_message('ERROR', message), *args, **kwargs)
+        super().error(self.format_message('ERROR', 'RED', message), *args, **kwargs)
 
 
 logging.setLoggerClass(CustomLogger)
@@ -58,8 +59,7 @@ class TurnstileAPIServer:
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Turnstile Solver</title>
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" 
-                async></script>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async></script>
     </head>
     <body>
         <!-- cf turnstile -->
@@ -110,18 +110,15 @@ class TurnstileAPIServer:
 
     async def _startup(self) -> None:
         """Initialize the browser and page pool on startup."""
-        logger.debug("Starting browser initialization...")
+        logger.info("Starting browser initialization")
         try:
             await self._initialize_browser()
-            logger.info("Browser and page pool initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize browser: {str(e)}")
             raise
 
     async def _initialize_browser(self) -> None:
         """Initialize the browser and create the page pool."""
-        if self.debug:
-            logger.debug("Initializing browser with arguments...")
 
         if self.browser_type == "chromium" or self.browser_type == "chrome":
             playwright = await async_playwright().start()
@@ -134,7 +131,6 @@ class TurnstileAPIServer:
                     headless=self.headless,
                     args=self.browser_args
                 )
-
                 page = await browser.new_page()
 
             elif self.browser_type == "chrome":
@@ -149,25 +145,25 @@ class TurnstileAPIServer:
             elif self.browser_type == "camoufox":
                 browser = await camoufox.start()
                 page = await browser.new_page()
-            else:
-                logger.error(f"Unknown browser type: {self.browser_type}")
-                sys.exit(1)
 
-            await self.browser_pool.put((browser, page))
+            await self.browser_pool.put((_+1, browser, page))
 
-        logger.debug(f"Browser pool initialized with {self.browser_pool.qsize()} browsers")
+            if self.debug:
+                logger.success(f"Browser {_ + 1} initialized successfully")
+
+        logger.success(f"Browser pool initialized with {self.browser_pool.qsize()} browsers")
 
 
     async def _solve_turnstile(self, task_id: str, url: str, sitekey: str, action: str = None, cdata: str = None):
         """Solve the Turnstile challenge."""
 
-        browser, page = await self.browser_pool.get()
+        index, browser, page = await self.browser_pool.get()
         start_time = time.time()
 
         try:
             if self.debug:
-                logger.debug(f"Starting Turnstile solve for URL: {url}")
-                logger.debug("Setting up page data and route")
+                logger.debug(f"Browser {index}: Starting Turnstile solve for URL: {url} with Sitekey: {sitekey}")
+                logger.debug(f"Browser {index}: Setting up page data and route")
 
             url_with_slash = url + "/" if not url.endswith("/") else url
             turnstile_div = f'<div class="cf-turnstile" data-sitekey="{sitekey}"' + (f' data-action="{action}"' if action else '') + (f' data-cdata="{cdata}"' if cdata else '') + '></div>'
@@ -177,7 +173,7 @@ class TurnstileAPIServer:
             await page.goto(url_with_slash)
 
             if self.debug:
-                logger.debug("Setting up Turnstile widget dimensions")
+                logger.debug(f"Browser {index}: Setting up Turnstile widget dimensions")
 
             await page.eval_on_selector(
                 "//div[@class='cf-turnstile']",
@@ -185,14 +181,14 @@ class TurnstileAPIServer:
             )
 
             if self.debug:
-                logger.debug("Starting Turnstile response retrieval loop")
+                logger.debug(f"Browser {index}: Starting Turnstile response retrieval loop")
 
             for _ in range(10):
                 try:
                     turnstile_check = await page.input_value("[name=cf-turnstile-response]")
                     if turnstile_check == "":
                         if self.debug:
-                            logger.debug(f"Attempt {_}: No Turnstile response yet")
+                            logger.debug(f"Browser {index}: Attempt {_} - No Turnstile response yet")
 
                         await page.click("//div[@class='cf-turnstile']", timeout=3000)
                         await asyncio.sleep(0.5)
@@ -202,7 +198,7 @@ class TurnstileAPIServer:
                             value = await element.get_attribute("value")
                             elapsed_time = round(time.time() - start_time, 3)
 
-                            logger.success(f"Successfully solved captcha: {value[:10]}... in {elapsed_time} Seconds")
+                            logger.success(f"Browser {index}: Successfully solved captcha - {COLORS.get('MAGENTA')}{value[:10]}{COLORS.get('RESET')} in {COLORS.get('GREEN')}{elapsed_time}{COLORS.get('RESET')} Seconds")
 
                             self.results[task_id] = {"value": value, "elapsed_time": elapsed_time}
                             self._save_results()
@@ -213,16 +209,18 @@ class TurnstileAPIServer:
             if self.results.get(task_id) == "CAPCHA_NOT_READY":
                 elapsed_time = round(time.time() - start_time, 3)
                 self.results[task_id] = {"value": "CAPTCHA_FAIL", "elapsed_time": elapsed_time}
-
+                if self.debug:
+                    logger.error(f"Browser {index}: Error solving Turnstile in {COLORS.get('RED')}{elapsed_time}{COLORS.get('RESET')} Seconds")
         except Exception as e:
             elapsed_time = round(time.time() - start_time, 3)
             self.results[task_id] = {"value": "CAPTCHA_FAIL", "elapsed_time": elapsed_time}
-            logger.error(f"Error solving Turnstile: {str(e)}")
+            if self.debug:
+                logger.error(f"Browser {index}: Error solving Turnstile: {str(e)}")
         finally:
             if self.debug:
-                logger.debug("Clearing page state")
+                logger.debug(f"Browser {index}: Clearing page state")
             await page.goto("about:blank")
-            await self.browser_pool.put((browser, page))
+            await self.browser_pool.put((index, browser, page))
 
     async def process_turnstile(self):
         """Handle the /turnstile endpoint requests."""
@@ -232,14 +230,11 @@ class TurnstileAPIServer:
         cdata = request.args.get('cdata')
 
         if not url or not sitekey:
-            logger.warning("Missing required parameters: 'url' or 'sitekey'")
             return jsonify({
                 "status": "error",
                 "error": "Both 'url' and 'sitekey' are required"
             }), 400
 
-        if self.debug:
-            logger.debug(f"Processing request for URL: {url}")
         task_id = str(uuid.uuid4())
         self.results[task_id] = "CAPTCHA_NOT_READY"
 
@@ -247,7 +242,7 @@ class TurnstileAPIServer:
             asyncio.create_task(self._solve_turnstile(task_id=task_id, url=url, sitekey=sitekey, action=action, cdata=cdata))
 
             if self.debug:
-                logger.debug(f"Request completed.")
+                logger.debug(f"Request completed with taskid {task_id}.")
             return jsonify({"task_id": task_id}), 202
         except Exception as e:
             logger.error(f"Unexpected error processing request: {str(e)}")
@@ -334,9 +329,15 @@ def create_app(headless: bool, useragent: str, debug: bool, browser_type: str, t
 
 if __name__ == '__main__':
     args = parse_args()
-
-    if args.headless is True and args.useragent is None and "camoufox" not in args.browser_type:
-        logger.error('You must specify a useragent for Turnstile Solver')
+    browser_types = [
+        'chromium',
+        'chrome',
+        'camoufox',
+    ]
+    if args.browser_type not in browser_types:
+        logger.error(f"Unknown browser type: {COLORS.get('RED')}{args.browser_type}{COLORS.get('RESET')} Available browser types: {browser_types}")
+    elif args.headless is True and args.useragent is None and "camoufox" not in args.browser_type:
+        logger.error(f"You must specify a {COLORS.get('YELLOW')}User-Agent{COLORS.get('RESET')} for Turnstile Solver or use {COLORS.get('GREEN')}camoufox{COLORS.get('RESET')} without useragent")
     else:
         app = create_app(headless=args.headless, useragent=args.useragent, debug=args.debug, browser_type=args.browser_type, thread=args.thread)
         app.run(host=args.host, port=int(args.port))
