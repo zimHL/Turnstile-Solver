@@ -55,9 +55,9 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 
 6. **Start testing**:
    - Run the script (Check [🔧 Command line arguments](#-command-line-arguments) for better setup):
-   ```bash
-   python api_solver.py
-   ```
+     ```bash
+     python api_solver.py
+     ```
 
 ---
 
