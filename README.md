@@ -15,13 +15,49 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 
 ---
 
-### ⚙️ Installation
-- Requires: `Python 3.8+`
-- Make a python virtual environment: `python3 -m venv venv`
-- Source the environment: `venv\Scripts\activate` (Windows) / `source venv/bin/activate` (macOS, Linux)
-- Install the requirements: `pip install -r requirements.txt`
-- Install chromium: `patchright install chromium` / `python -m patchright install chromium`
-- Start: `Remove comments for testing in async and sync python files then run those`
+### ⚙️ Installation Instructions
+
+1. **Ensure Python 3.8+ is installed** on your system.
+
+2. **Create a Python virtual environment**:
+   ```bash
+   python -m venv venv
+   ```
+
+3. **Activate the virtual environment**:
+   - On **Windows**:
+     ```bash
+     venv\Scripts\activate
+     ```
+   - On **macOS/Linux**:
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. **Install required dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Select the browser to install**:
+
+   You can choose between **Chromium** or **Camoufox**:
+
+   - To install **Chromium**:
+     ```bash
+     python -m patchright install chromium
+     ```
+
+   - To install **Camoufox**:
+     ```bash
+     python -m camoufox fetch
+     ```
+
+6. **Start testing**:
+   - Run the script (Check [🔧 Command line arguments](#-command-line-arguments) for better setup):
+   ```bash
+   python api_solver.py
+   ```
 
 ---
 
@@ -51,7 +87,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 | `--headless`   | `False`  | `boolean` | Runs the browser in headless mode. Requires the `--useragent` argument to be set.             |
 | `--useragent`  | `None`   | `string`  | Specifies a custom User-Agent string for the browser.                                        |
 | `--debug`      | `False`  | `boolean` | Enables or disables debug mode for additional logging and troubleshooting.                   |
-| `--persistent` | `False`  | `boolean` | Enables a persistent browser context.      |
+| `--browser_type` | `chromium`  | `string` | Specify the browser type for the solver. Supported options: chromium, chrome, camufox      |
 | `--thread`     | `1`      | `integer` | Sets the number of browser threads to use in multi-threaded mode.                           |
 | `--host`       | `127.0.0.1` | `string`  | Specifies the IP address the API solver runs on.                                            |
 | `--port`       | `5000`   | `integer` | Sets the port the API solver listens on.                                                    |
