@@ -87,7 +87,7 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
 | `--headless`   | `False`  | `boolean` | Runs the browser in headless mode. Requires the `--useragent` argument to be set.             |
 | `--useragent`  | `None`   | `string`  | Specifies a custom User-Agent string for the browser.                                        |
 | `--debug`      | `False`  | `boolean` | Enables or disables debug mode for additional logging and troubleshooting.                   |
-| `--browser_type` | `chromium`  | `string` | Specify the browser type for the solver. Supported options: chromium, chrome, camufox      |
+| `--browser_type` | `chromium`  | `string` | Specify the browser type for the solver. Supported options: chromium, chrome, camoufox      |
 | `--thread`     | `1`      | `integer` | Sets the number of browser threads to use in multi-threaded mode.                           |
 | `--host`       | `127.0.0.1` | `string`  | Specifies the IP address the API solver runs on.                                            |
 | `--port`       | `5000`   | `integer` | Sets the port the API solver listens on.                                                    |
