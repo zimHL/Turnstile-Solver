@@ -123,6 +123,16 @@ If the CAPTCHA is solved successfully, the server will respond with the followin
 
 ---
 
+### 📝 TODO List  
+- [x] Add `cData` and `Action` support  
+- [x] Add multi-threaded solving method
+- [x] Add Docker support  
+- [ ] Update [`main.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/main.py), [`async_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/async_solver.py), and [`sync_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/sync_solver.py) 
+- [ ] Add proxy support  
+- [ ] Fix headless mode  
+
+---
+
 ### 📜 ChangeLog
 ```diff
 v0.0.1 ⋮ 21/10/2024
