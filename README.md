@@ -220,6 +220,9 @@ v0.2.0 ⋮ 24/02/2025
 
 v0.2.1 ⋮ 24/02/2025  
 + Fixed main.py, async_solver.py and sync_solver.py
+
+v0.2.2 ⋮ 24/02/2025  
++ Added proxy support
 ```
 
 ---
