@@ -40,14 +40,21 @@ A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6
    ```
 
 5. **Select the browser to install**:
-
-   You can choose between **Chromium** or **Camoufox**:
-
+   You can choose between **Chromium**, **Chrome** or **Camoufox**:
    - To install **Chromium**:
      ```bash
      python -m patchright install chromium
      ```
-
+   - To install **Chrome**:
+     - On **macOS/Windows**: [Click here](https://www.google.com/chrome/)  
+     - On **Linux (Debian/Ubuntu-based)**:
+       ```bash
+       apt update
+       wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+       apt install -y ./google-chrome-stable_current_amd64.deb
+       apt -f install -y  # Fix dependencies if needed
+       rm ./google-chrome-stable_current_amd64.deb
+       ```
    - To install **Camoufox**:
      ```bash
      python -m camoufox fetch
@@ -163,9 +170,9 @@ If the CAPTCHA is solved successfully, the server will respond with the followin
 - [x] Add `cData` and `Action` support  
 - [x] Add multi-threaded solving method
 - [x] Add Docker support  
+- [x] Fix headless mode  
 - [ ] Update [`main.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/main.py), [`async_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/async_solver.py), and [`sync_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/sync_solver.py) 
 - [ ] Add proxy support  
-- [ ] Fix headless mode  
 
 ---
 
