@@ -171,7 +171,7 @@ If the CAPTCHA is solved successfully, the server will respond with the followin
 - [x] Add multi-threaded solving method
 - [x] Add Docker support  
 - [x] Fix headless mode  
-- [ ] Update [`main.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/main.py), [`async_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/async_solver.py), and [`sync_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/sync_solver.py) 
+- [x] Update [`main.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/main.py), [`async_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/async_solver.py), and [`sync_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/sync_solver.py) 
 - [ ] Add proxy support  
 
 ---
