@@ -2,7 +2,7 @@
  
   <h2 align="center">Cloudflare - Turnstile Solver</h2>
   <p align="center">
-A Python-based solution for solving Cloudflare Turnstile challenges quickly (4-6 seconds solve time). The script uses patchright library to interact with web pages and solve the challenges without running additional browser instances.
+A Python-based Turnstile solver using the patchright library, featuring multi-threaded execution, API integration, and support for different browsers. It solves CAPTCHAs quickly and efficiently, with customizable configurations and detailed logging.
     <br />
     <br />
     <a href="https://github.com/Theyka/Turnstile-Solver#-changelog">📜 ChangeLog</a>
