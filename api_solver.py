@@ -135,13 +135,13 @@ class TurnstileAPIServer:
     async def _initialize_browser(self) -> None:
         """Initialize the browser and create the page pool."""
 
-        if self.browser_type == "chromium" or self.browser_type == "chrome":
+        if self.browser_type in ['chromium', 'chrome', 'msedge']:
             playwright = await async_playwright().start()
         elif self.browser_type == "camoufox":
             camoufox = AsyncCamoufox(headless=self.headless)
 
         for _ in range(self.thread_count):
-            if self.browser_type == "chromium" or self.browser_type == "chrome":
+            if self.browser_type in ['chromium', 'chrome', 'msedge']:
                 browser = await playwright.chromium.launch(
                     channel=self.browser_type,
                     headless=self.headless,
@@ -170,17 +170,19 @@ class TurnstileAPIServer:
             with open(proxy_file_path) as proxy_file:
                 proxies = [line.strip() for line in proxy_file if line.strip()]
 
-        proxy = random.choice(proxies) if proxies else None
+            proxy = random.choice(proxies) if proxies else None
 
-        if proxy:
-            parts = proxy.split(':')
-            if len(parts) == 3:
-                context = await browser.new_context(proxy={"server": f"{proxy}"})
-            elif len(parts) == 5:
-                proxy_scheme, proxy_ip, proxy_port, proxy_user, proxy_pass = parts
-                context = await browser.new_context(proxy={"server": f"{proxy_scheme}://{proxy_ip}:{proxy_port}", "username": proxy_user, "password": proxy_pass})
+            if proxy:
+                parts = proxy.split(':')
+                if len(parts) == 3:
+                    context = await browser.new_context(proxy={"server": f"{proxy}"})
+                elif len(parts) == 5:
+                    proxy_scheme, proxy_ip, proxy_port, proxy_user, proxy_pass = parts
+                    context = await browser.new_context(proxy={"server": f"{proxy_scheme}://{proxy_ip}:{proxy_port}", "username": proxy_user, "password": proxy_pass})
+                else:
+                    raise ValueError("Invalid proxy format")
             else:
-                raise ValueError("Invalid proxy format")
+                context = await browser.new_context()
         else:
             context = await browser.new_context()
 
@@ -345,7 +347,7 @@ def parse_args():
     parser.add_argument('--headless', type=bool, default=False, help='Run the browser in headless mode, without opening a graphical interface. This option requires the --useragent argument to be set (default: False)')
     parser.add_argument('--useragent', type=str, default=None, help='Specify a custom User-Agent string for the browser. If not provided, the default User-Agent is used')
     parser.add_argument('--debug', type=bool, default=False, help='Enable or disable debug mode for additional logging and troubleshooting information (default: False)')
-    parser.add_argument('--browser_type', type=str, default='chromium', help='Specify the browser type for the solver. Supported options: chromium, chrome, camoufox (default: chromium)')
+    parser.add_argument('--browser_type', type=str, default='chromium', help='Specify the browser type for the solver. Supported options: chromium, chrome, msedge, camoufox (default: chromium)')
     parser.add_argument('--thread', type=int, default=1, help='Set the number of browser threads to use for multi-threaded mode. Increasing this will speed up execution but requires more resources (default: 1)')
     parser.add_argument('--proxy', type=bool, default=False, help='Enable proxy support for the solver (Default: False)')
     parser.add_argument('--host', type=str, default='127.0.0.1', help='Specify the IP address where the API solver runs. (Default: 127.0.0.1)')
@@ -363,6 +365,7 @@ if __name__ == '__main__':
     browser_types = [
         'chromium',
         'chrome',
+        'msedge',
         'camoufox',
     ]
     if args.browser_type not in browser_types:
