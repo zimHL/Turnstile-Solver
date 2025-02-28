@@ -46,7 +46,7 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
    ```
 
 5. **Select the browser to install**:
-   You can choose between **Chromium**, **Chrome** or **Camoufox**:
+   You can choose between **Chromium**, **Chrome**, **Edge** or **Camoufox**:
    - To install **Chromium**:
      ```bash
      python -m patchright install chromium
@@ -61,6 +61,10 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
        apt -f install -y  # Fix dependencies if needed
        rm ./google-chrome-stable_current_amd64.deb
        ```
+   - To install **Edge**:
+     ```bash
+     python -m patchright install msedge
+     ```
    - To install **Camoufox**:
      ```bash
      python -m camoufox fetch
@@ -100,7 +104,7 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
 | `--headless`   | `False`  | `boolean` | Runs the browser in headless mode. Requires the `--useragent` argument to be set.             |
 | `--useragent`  | `None`   | `string`  | Specifies a custom User-Agent string for the browser. (No need to set if camoufox used)                                        |
 | `--debug`      | `False`  | `boolean` | Enables or disables debug mode for additional logging and troubleshooting.                   |
-| `--browser_type` | `chromium`  | `string` | Specify the browser type for the solver. Supported options: chromium, chrome, camoufox      |
+| `--browser_type` | `chromium`  | `string` | Specify the browser type for the solver. Supported options: chromium, chrome, msedge, camoufox      |
 | `--thread`     | `1`      | `integer` | Sets the number of browser threads to use in multi-threaded mode.                           |
 | `--host`       | `127.0.0.1` | `string`  | Specifies the IP address the API solver runs on.                                            |
 | `--port`       | `5000`   | `integer` | Sets the port the API solver listens on.                                                    |
@@ -223,6 +227,9 @@ v0.2.1 ⋮ 24/02/2025
 
 v0.2.2 ⋮ 24/02/2025  
 + Added proxy support
+
+v0.2.4 ⋮ 01/03/2025  
++ Added edge support
 ```
 
 ---
