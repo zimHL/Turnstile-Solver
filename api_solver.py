@@ -161,6 +161,7 @@ class TurnstileAPIServer:
 
     async def _solve_turnstile(self, task_id: str, url: str, sitekey: str, action: str = None, cdata: str = None):
         """Solve the Turnstile challenge."""
+        proxy = None
 
         index, browser = await self.browser_pool.get()
 
