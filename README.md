@@ -18,6 +18,7 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
     <img src="https://img.shields.io/github/issues/Theyka/Turnstile-Solver?style=for-the-badge&color=red"/>
   </p>
 </div>
+
 ---
 
 ### 🎁 Donation
