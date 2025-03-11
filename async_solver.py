@@ -1,11 +1,8 @@
-import os
 import sys
 import time
-import random
-import string
 import logging
 import asyncio
-from typing import Dict, Optional
+from typing import Optional
 from dataclasses import dataclass
 from camoufox.async_api import AsyncCamoufox
 from patchright.async_api import async_playwright
@@ -140,7 +137,7 @@ class AsyncTurnstileSolver:
 
         return None
 
-    async def solve(self, url: str, sitekey: str, action: str = None, cdata: str = None) -> TurnstileResult:
+    async def solve(self, url: str, sitekey: str, action: str = None, cdata: str = None):
         """
         Solve the Turnstile challenge and return the result.
         """
@@ -194,7 +191,7 @@ class AsyncTurnstileSolver:
         return result
 
 
-async def get_turnstile_token(url: str, sitekey: str, action: str = None, cdata: str = None, debug: bool = False, headless: bool = False, useragent: str = None, browser_type: str = "chromium") -> Dict:
+async def get_turnstile_token(url: str, sitekey: str, action: str = None, cdata: str = None, debug: bool = False, headless: bool = False, useragent: str = None, browser_type: str = "chromium"):
     """Legacy wrapper function for backward compatibility."""
     browser_types = [
         'chromium',

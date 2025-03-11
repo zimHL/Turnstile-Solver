@@ -1,10 +1,7 @@
-import os
 import sys
 import time
-import random
-import string
 import logging
-from typing import Dict, Optional
+from typing import Optional
 from dataclasses import dataclass
 from camoufox.sync_api import Camoufox
 from patchright.sync_api import sync_playwright
@@ -139,7 +136,7 @@ class TurnstileSolver:
 
         return None
 
-    def solve(self, url: str, sitekey: str, action: str = None, cdata: str = None) -> TurnstileResult:
+    def solve(self, url: str, sitekey: str, action: str = None, cdata: str = None):
         """
         Solve the Turnstile challenge and return the result.
         """
@@ -186,7 +183,7 @@ class TurnstileSolver:
         return result
 
 
-def get_turnstile_token(url: str, sitekey: str, action: str = None, cdata: str = None, debug: bool = False, headless: bool = False, useragent: str = None, browser_type: str = "chromium") -> Dict:
+def get_turnstile_token(url: str, sitekey: str, action: str = None, cdata: str = None, debug: bool = False, headless: bool = False, useragent: str = None, browser_type: str = "chromium"):
     """Legacy wrapper function for backward compatibility."""
     browser_types = [
         'chromium',
