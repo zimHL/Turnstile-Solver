@@ -62,19 +62,29 @@ class AsyncTurnstileSolver:
     HTML_TEMPLATE = """
     <!DOCTYPE html>
     <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Turnstile Solver</title>
-        <script
-          src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
-          async=""
-          defer=""
-        ></script>
-      </head>
-      <body>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async></script>
+        <script>
+            async function fetchIP() {
+                try {
+                    const response = await fetch('https://api64.ipify.org?format=json');
+                    const data = await response.json();
+                    document.getElementById('ip-display').innerText = `Your IP: ${data.ip}`;
+                } catch (error) {
+                    console.error('Error fetching IP:', error);
+                    document.getElementById('ip-display').innerText = 'Failed to fetch IP';
+                }
+            }
+            window.onload = fetchIP;
+        </script>
+    </head>
+    <body>
         <!-- cf turnstile -->
-      </body>
+        <p id="ip-display">Fetching your IP...</p>
+    </body>
     </html>
     """
 
@@ -110,23 +120,23 @@ class AsyncTurnstileSolver:
     async def _get_turnstile_response(self, page, max_attempts: int = 10) -> Optional[str]:
         """Attempt to retrieve Turnstile response."""
         for _ in range(max_attempts):
-            turnstile_check = await page.eval_on_selector(
-                "[name=cf-turnstile-response]",
-                "el => el.value"
-            )
+            if self.debug:
+                logger.debug(f"Attempt {_ + 1}: No Turnstile response yet.")
 
-            if turnstile_check == "":
-                if self.debug:
-                    logger.debug(f"Attempt {_+1}: No Turnstile response yet.")
+            try:
+                turnstile_check = await page.input_value("[name=cf-turnstile-response]")
+                if turnstile_check == "":
 
-                await page.evaluate("document.querySelector('.cf-turnstile').style.width = '70px'")
-                await page.click(".cf-turnstile")
-                await asyncio.sleep(0.5)
-            else:
-                turnstile_element = await page.query_selector("[name=cf-turnstile-response]")
-                if turnstile_element:
-                    return await turnstile_element.get_attribute("value")
-                break
+                    await page.click("//div[@class='cf-turnstile']", timeout=3000)
+                    await asyncio.sleep(0.5)
+                else:
+                    element = await page.query_selector("[name=cf-turnstile-response]")
+                    if element:
+                        turnstile_element = await page.query_selector("[name=cf-turnstile-response]")
+                        return await turnstile_element.get_attribute("value")
+                    break
+            except:
+                pass
 
         return None
 
@@ -135,20 +145,11 @@ class AsyncTurnstileSolver:
         Solve the Turnstile challenge and return the result.
         """
         start_time = time.time()
-        if self.browser_type == "chromium":
+        if self.browser_type in ["chromium", "chrome", "msedge"]:
             playwright = await async_playwright().start()
             browser = await playwright.chromium.launch(
                 headless=self.headless,
                 args=self.browser_args
-            )
-
-        elif self.browser_type == "chrome":
-            playwright = await async_playwright().start()
-            browser = await playwright.chromium.launch_persistent_context(
-                user_data_dir=f"{os.getcwd()}/tmp/turnstile-chrome-{''.join(random.choices(string.ascii_letters + string.digits, k=10))}",
-                channel="chrome",
-                headless=self.headless,
-                no_viewport=True,
             )
 
         elif self.browser_type == "camoufox":
@@ -199,6 +200,7 @@ async def get_turnstile_token(url: str, sitekey: str, action: str = None, cdata:
         'chromium',
         'chrome',
         'camoufox',
+        'msedge'
     ]
     if browser_type not in browser_types:
         logger.error(f"Unknown browser type: {COLORS.get('RED')}{browser_type}{COLORS.get('RESET')} Available browser types: {browser_types}")
@@ -212,13 +214,13 @@ async def get_turnstile_token(url: str, sitekey: str, action: str = None, cdata:
 
 if __name__ == "__main__":
     result = asyncio.run(get_turnstile_token(
-        url="https://bypass.city/",
-        sitekey="0x4AAAAAAAGzw6rXeQWJ_y2P",
+        url="https://www.crunchbase.com/login",
+        sitekey="0x4AAAAAAAyJK2FfyvayqHnv",
         action=None,
         cdata=None,
         debug=True,
         headless=False,
         useragent=None,
-        browser_type="camoufox"
+        browser_type="chromium"
     ))
     print(result)
