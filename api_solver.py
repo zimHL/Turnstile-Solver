@@ -216,7 +216,7 @@ class TurnstileAPIServer:
 
             for _ in range(10):
                 try:
-                    turnstile_check = await page.input_value("[name=cf-turnstile-response]")
+                    turnstile_check = await page.input_value("[name=cf-turnstile-response]", timeout=2000)
                     if turnstile_check == "":
                         if self.debug:
                             logger.debug(f"Browser {index}: Attempt {_} - No Turnstile response yet")
@@ -237,7 +237,7 @@ class TurnstileAPIServer:
                 except:
                     pass
 
-            if self.results.get(task_id) == "CAPCHA_NOT_READY":
+            if self.results.get(task_id) == "CAPTCHA_NOT_READY":
                 elapsed_time = round(time.time() - start_time, 3)
                 self.results[task_id] = {"value": "CAPTCHA_FAIL", "elapsed_time": elapsed_time}
                 if self.debug:
