@@ -27,6 +27,7 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
 - **USDT (Arbitrum One)**: ``0xd8fd1e91c8af318a74a0810505f60ccca4ca0f8c``
 - **BTC**:
 ``1AbiR2YaCzvmy9itMAJqHejYYENtogDr78``
+- **LTC**: ``LSrLQe2dfpDhGgVvDTRwW72fSyC9VsXp9g``
 
 ---
 
