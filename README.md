@@ -13,7 +13,7 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
   </p>
 
   <p align="center">
-    <img src="https://img.shields.io/github/license/Theyka/Turnstile-Solver.svg?style=for-the-badge&color=red"/>
+    <img src="https://img.shields.io/badge/LICENSE-CC%20BY%20NC%204.0-red?style=for-the-badge"/>
     <img src="https://img.shields.io/github/stars/Theyka/Turnstile-Solver.svg?style=for-the-badge&color=red"/>
     <img src="https://img.shields.io/github/issues/Theyka/Turnstile-Solver?style=for-the-badge&color=red"/>
   </p>
