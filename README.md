@@ -31,6 +31,12 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
 
 ---
 
+### ❗ Disclaimers
+- I am not responsible for anything that may happen, such as API Blocking, IP ban, etc.
+- This was a quick project that was made for fun and personal use if you want to see further updates, star the repo & create an "issue" [here](https://github.com/Theyka/Turnstile-Solver/issues/)
+
+---
+
 ### ⚙️ Installation Instructions
 
 1. **Ensure Python 3.8+ is installed** on your system.
@@ -85,27 +91,7 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
      ```bash
      python api_solver.py
      ```
-
----
-
-### 🔥 Features
-- **Debug Logging**: Detailed debug logs track actions and progress, making troubleshooting straightforward.
-- **Automated CAPTCHA Solver**: Uses Playwright to launch a browser, navigate to the target page, and dynamically injects a CAPTCHA solver.
-- **Multi-threaded Mode**: Supports multi-threaded execution, allowing multiple browser instances to run concurrently, speeding up processing.
-- **Persistent Browser Context**: Uses a persistent context browser for better security and session management across multiple runs.
-- **API Server Integration**: Implements an API server for easy integration, offering customizable configurations like host and port, and exposing essential functions.
-- **Customizable Browser Context**: Sets browser options like headless mode, sandboxing, and disabling unnecessary features to optimize performance.
-- **Responsive CAPTCHA Interaction**: Adjusts CAPTCHA display, clicks on it, and retrieves the response through repeated attempts if necessary.
-- **Timeout and Retries**: Implements a retry loop with configurable timeouts, ensuring robust attempts to retrieve the CAPTCHA token.
-- **Elapsed Time Tracking**: Logs and returns elapsed time for solving CAPTCHA, providing an efficiency metric.
-- **Error Handling**: Returns detailed status messages on success or failure, allowing for straightforward integration and feedback.
-
----
-
-### ❗ Disclaimers
-- I am not responsible for anything that may happen, such as API Blocking, IP ban, etc.
-- This was a quick project that was made for fun and personal use if you want to see further updates, star the repo & create an "issue" [here](https://github.com/Theyka/Turnstile-Solver/issues/)
-
+     
 ---
 
 ### 🔧 Command line arguments
@@ -187,60 +173,10 @@ If the CAPTCHA is solved successfully, the server will respond with the followin
 
 ---
 
-### 📝 TODO List  
-- [x] Add `cData` and `Action` support  
-- [x] Add multi-threaded solving method
-- [x] Add Docker support  
-- [x] Fix headless mode  
-- [x] Update [`main.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/main.py), [`async_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/async_solver.py), and [`sync_solver.py`](https://github.com/Theyka/Turnstile-Solver/blob/main/sync_solver.py) 
-- [x] Add proxy support  
-
----
-
-### 📜 ChangeLog
-```diff
-v0.0.1 ⋮ 21/10/2024
-! Initial release
-
-v0.0.2 ⋮ 28/10/2024
-! Modified the script, page.html is now in the scripts
-! Made it faster and less resource intensive
-! Modified the sync logic and made an async version
-! Implemented logmagix logging
-! Added timer
-
-v0.1.0 ⋮ 11/7/2024
-+ Added API server implementation
-+ Added web interface for API documentation
-+ Improved error handling and logging
-+ Added concurrent processing support
-
-v0.1.1 ⋮ 15/2/2025
-+ Added --headless argument
-+ Added --debug argument
-+ Added --useragent argument
-! Modified logging method to use the logging library
-
-v0.1.2 ⋮ 19/02/2025  
-+ Added optional action and cData parameters, similar to sitekey and url.
-
-v0.1.3 ⋮ 22/02/2025  
-+ Added persistent context browser for improved security
-+ Implemented multi-threaded mode for enhanced performance
-+ Added method to configure host and port for API server
-
-v0.2.0 ⋮ 24/02/2025  
-+ Added Camoufox support
-
-v0.2.1 ⋮ 24/02/2025  
-+ Fixed main.py, async_solver.py and sync_solver.py
-
-v0.2.2 ⋮ 24/02/2025  
-+ Added proxy support
-
-v0.2.4 ⋮ 01/03/2025  
-+ Added edge support
-```
+### 🎉 Sponsor
+<a href="https://dashboard.capsolver.com/passport/register?inviteCode=7_Dvkat0RVqc">
+    <img src="https://github.com/user-attachments/assets/176d2a43-2d08-4aa6-bc9d-5e1eb5c3d1a4" alt="Description">
+</a>
 
 ---
 
