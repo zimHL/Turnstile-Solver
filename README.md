@@ -25,9 +25,17 @@ A Python-based Turnstile solver using the patchright library, featuring multi-th
 
 - **USDT (TRC20)**: ``TWXNQCnJESt6gxNMX5oHKwQzq4gsbdLNRh``
 - **USDT (Arbitrum One)**: ``0xd8fd1e91c8af318a74a0810505f60ccca4ca0f8c``
-- **BTC**:
-``1AbiR2YaCzvmy9itMAJqHejYYENtogDr78``
+- **BTC**: ``1AbiR2YaCzvmy9itMAJqHejYYENtogDr78``
 - **LTC**: ``LSrLQe2dfpDhGgVvDTRwW72fSyC9VsXp9g``
+
+---
+
+### ❓ Need custom solution ?
+- Need custom solution like Cloudflare Interstitial ? Contact me on telegram:
+
+  <a href="https://t.me/tlb_sh">
+    <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white"/>
+  </a>
 
 ---
 
