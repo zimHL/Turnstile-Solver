@@ -197,7 +197,7 @@ class TurnstileAPIServer:
                 logger.debug(f"Browser {index}: Setting up page data and route")
 
             url_with_slash = url + "/" if not url.endswith("/") else url
-            turnstile_div = f'<div class="cf-turnstile" data-sitekey="{sitekey}"' + (f' data-action="{action}"' if action else '') + (f' data-cdata="{cdata}"' if cdata else '') + '></div>'
+            turnstile_div = f'<div class="cf-turnstile" style="background: white;" data-sitekey="{sitekey}"' + (f' data-action="{action}"' if action else '') + (f' data-cdata="{cdata}"' if cdata else '') + '></div>'
             page_data = self.HTML_TEMPLATE.replace("<!-- cf turnstile -->", turnstile_div)
 
             await page.route(url_with_slash, lambda route: route.fulfill(body=page_data, status=200))
@@ -206,10 +206,7 @@ class TurnstileAPIServer:
             if self.debug:
                 logger.debug(f"Browser {index}: Setting up Turnstile widget dimensions")
 
-            await page.eval_on_selector(
-                "//div[@class='cf-turnstile']",
-                "el => el.style.width = '70px'"
-            )
+            await page.eval_on_selector("//div[@class='cf-turnstile']", "el => el.style.width = '70px'")
 
             if self.debug:
                 logger.debug(f"Browser {index}: Starting Turnstile response retrieval loop")
@@ -220,19 +217,16 @@ class TurnstileAPIServer:
                     if turnstile_check == "":
                         if self.debug:
                             logger.debug(f"Browser {index}: Attempt {_} - No Turnstile response yet")
-
-                        await page.click("//div[@class='cf-turnstile']", timeout=3000)
+                        
+                        await page.locator("//div[@class='cf-turnstile']").click(timeout=1000)
                         await asyncio.sleep(0.5)
                     else:
-                        element = await page.query_selector("[name=cf-turnstile-response]")
-                        if element:
-                            value = await element.get_attribute("value")
-                            elapsed_time = round(time.time() - start_time, 3)
+                        elapsed_time = round(time.time() - start_time, 3)
 
-                            logger.success(f"Browser {index}: Successfully solved captcha - {COLORS.get('MAGENTA')}{value[:10]}{COLORS.get('RESET')} in {COLORS.get('GREEN')}{elapsed_time}{COLORS.get('RESET')} Seconds")
+                        logger.success(f"Browser {index}: Successfully solved captcha - {COLORS.get('MAGENTA')}{turnstile_check[:10]}{COLORS.get('RESET')} in {COLORS.get('GREEN')}{elapsed_time}{COLORS.get('RESET')} Seconds")
 
-                            self.results[task_id] = {"value": value, "elapsed_time": elapsed_time}
-                            self._save_results()
+                        self.results[task_id] = {"value": turnstile_check, "elapsed_time": elapsed_time}
+                        self._save_results()
                         break
                 except:
                     pass
@@ -252,7 +246,6 @@ class TurnstileAPIServer:
                 logger.debug(f"Browser {index}: Clearing page state")
 
             await context.close()
-
             await self.browser_pool.put((index, browser))
 
     async def process_turnstile(self):
