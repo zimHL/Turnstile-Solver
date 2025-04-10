@@ -32,7 +32,8 @@ RUN apt-get update && \
     dbus-x11 \
     xfce4-terminal \
     python3-pip \
-    ca-certificates
+    ca-certificates \
+    xvfb
 
 RUN apt remove -y light-locker xscreensaver && \
     apt autoremove -y && \
