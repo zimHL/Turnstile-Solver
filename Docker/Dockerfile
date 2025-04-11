@@ -5,6 +5,7 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 ENV TZ=America/New_York
+ENV RUN_API_SOLVER=false
 
 
 RUN apt-get update && \
@@ -31,7 +32,8 @@ RUN apt-get update && \
     dbus-x11 \
     xfce4-terminal \
     python3-pip \
-    ca-certificates
+    ca-certificates \
+    xvfb
 
 RUN apt remove -y light-locker xscreensaver && \
     apt autoremove -y && \
