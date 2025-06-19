@@ -31,9 +31,12 @@ RUN apt-get update && \
     xorgxrdp \
     dbus-x11 \
     xfce4-terminal \
+    python3 \
     python3-pip \
     ca-certificates \
-    xvfb
+    xvfb \
+	iputils-ping \
+	net-tools
 
 RUN apt remove -y light-locker xscreensaver && \
     apt autoremove -y && \
@@ -46,6 +49,13 @@ RUN apt-get update && \
 
 COPY ./run.sh /usr/bin/
 RUN chmod +x /usr/bin/run.sh
+
+# 克隆 Turnstile-Solver 仓库并安装依赖
+RUN mkdir -p /root/Desktop && \
+	cd /root/Desktop && \
+    git clone https://github.com/zimHL/Turnstile-Solver.git && \
+    cd Turnstile-Solver && \
+    pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt --break-system-packages
 
 EXPOSE 3389
 ENTRYPOINT ["/usr/bin/run.sh"]
