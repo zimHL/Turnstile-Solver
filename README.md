@@ -4,12 +4,6 @@
   <p align="center">
 一个基于 Python 和 Patchright 库的 Turnstile 解决方案，具有多线程执行、API 集成和多浏览器支持的特点。它能高效快速地解决 CAPTCHA，并提供可定制的配置和详细的日志记录。
     <br />
-    <br />
-    <a href="https://github.com/Theyka/Turnstile-Solver#-changelog">📜 更新日志</a>
-    ·
-    <a href="https://github.com/Theyka/Turnstile-Solver/issues">⚠️ 报告问题</a>
-    ·
-    <a href="https://github.com/Theyka/Turnstile-Solver/issues">💡 功能建议</a>
   </p>
 
   <p align="center">
@@ -24,27 +18,9 @@
 
 ---
 
-### 🎁 捐赠
-
-- **USDT (TRC20)**: `TWXNQCnJESt6gxNMX5oHKwQzq4gsbdLNRh`
-- **USDT (Arbitrum One)**: `0xd8fd1e91c8af318a74a0810505f60ccca4ca0f8c`
-- **BTC**: `1AbiR2YaCzvmy9itMAJqHejYYENtogDr78`
-- **LTC**: `LSrLQe2dfpDhGgVvDTRwW72fSyC9VsXp9g`
-
----
-
-### ❓ 需要定制解决方案？
-- 需要如 Cloudflare Interstitial 等定制化解决方案？请通过 Telegram 联系我:
-
-  <a href="https://t.me/tlb_sh">
-    <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white"/>
-  </a>
-
----
-
 ### ❗ 免责声明
 - 我不对任何可能发生的事情负责，例如 API 封锁、IP 被禁等。
-- 这是一个为了娱乐和个人使用而快速制作的项目。如果您希望看到更多更新，请给本仓库点赞（Star）并通过 [这里](https://github.com/Theyka/Turnstile-Solver/issues/) 提交 "issue"。
+- 这是一个为了娱乐和个人使用而快速制作的项目。如果您希望看到更多更新，请给本仓库点赞（Star）并通过 [这里](https://github.com/zimHL/Turnstile-Solver/issues/) 提交 "issue"。
 
 ---
 
@@ -59,7 +35,7 @@
 #### **步骤 1: 获取项目文件**
 首先，将项目克隆到您的服务器上。
 ```bash
-git clone https://github.com/Theyka/Turnstile-Solver.git
+git clone https://github.com/zimHL/Turnstile-Solver.git
 cd Turnstile-Solver
 ```
 
@@ -72,12 +48,14 @@ version: '3.8'
 services:
   turnstile_solver:
     # 如果您想自己构建镜像，请取消下面的注释
-    # build: .
+    # build: 
+    #   context: .
+    #   dockerfile: Dockerfile
     # 如果您想使用预构建的镜像，请使用下面这行
     image: zim/turnstile_solver:latest # 假设您已经构建或拉取了此镜像
     container_name: turnstile_solver
     ports:
-      - "59031:5000" # 左侧是您服务器的端口，右侧是容器内的端口
+      - "5000:5000" # 左侧是您服务器的端口，右侧是容器内的端口
     volumes:
       # 将本地的 camoufox_cache 目录挂载到容器内，用于持久化存储浏览器文件
       - ./camoufox_cache:/root/.cache
@@ -155,22 +133,8 @@ docker compose up -d
 
 ---
 
-### 🐳 旧版Docker部署 (带远程桌面)
+### 🐳 旧版Docker部署 (带远程桌面) 参考 Docker目录下的两个文件
 此方法提供一个包含完整桌面环境的镜像，您可以通过 RDP 客户端连接进去手动操作。
-
-#### **运行容器**
-- 请根据需要修改 `TZ` 环境变量和端口映射：
-```sh
-docker run -d -p 3389:3389 -p 5000:5000 -e TZ=Asia/Baku --name turnstile_solver theyka/turnstile_solver:latest
-```
-
-#### **连接到容器**
-1.  使用 **RDP 客户端** (如 Windows 远程桌面)。
-2.  连接到 `localhost:3389`。
-3.  使用默认凭据登录:
-    - **用户名:** root
-    - **密码:** root
-4.  登录后，进入 `Turnstile-Solver` 文件夹即可启动求解器。
 
 ---
 
@@ -211,13 +175,6 @@ docker run -d -p 3389:3389 -p 5000:5000 -e TZ=Asia/Baku --name turnstile_solver 
 
 ---
 
-### 🎉 赞助商
-<a href="https://dashboard.capsolver.com/passport/register?inviteCode=7_Dvkat0RVqc">
-    <img src="https://github.com/user-attachments/assets/176d2a43-2d08-4aa6-bc9d-5e1eb5c3d1a4" alt="Description">
-</a>
-
----
-
 Inspired by [Turnaround](https://github.com/Body-Alhoha/turnaround)
 Original code by [Theyka](https://github.com/Theyka/Turnstile-Solver)
-Changes by [Sexfrance](https://github.com/sexfrance)
+Changes by [zimHL](https://github.com/zimHL/Turnstile-Solver)
