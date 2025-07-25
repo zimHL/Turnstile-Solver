@@ -1,0 +1,15 @@
+services:
+  turnstile_solver:
+    image: zimhl/turnstile_solver:latest
+    container_name: turnstile_solver
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "59031:5000"  # API 端口
+    volumes:
+      - .:/app
+      - ./camoufox_cache:/root/.cache
+    environment:
+      - TZ=Asia/Shanghai
+      - RUN_API_SOLVER=true
