@@ -57,6 +57,7 @@ services:
     ports:
       - "5000:5000" # 左侧是您服务器的端口，右侧是容器内的端口
     volumes:
+      - .:/app
       # 将本地的 camoufox_cache 目录挂载到容器内，用于持久化存储浏览器文件
       - ./camoufox_cache:/root/.cache
     environment:
